@@ -75,6 +75,9 @@ A:
 
 ## VSCode配置文件说明
 
+特别需要注意，vscode中的.vscode需要和工程文件夹的顶级目录名并列
+${workspaceFolder}这里是指路径到train为止，它下面就是snippet和.vscode
+
 ### Windows配置
 
 [参考链接](https://code.visualstudio.com/docs/cpp/config-msvc)
@@ -111,7 +114,12 @@ A:
 还有一种你自己设置了工作区的，在工作区文件夹下的.vscode；文件名是c_cpp_properties.json ,因为设置的是C和C++的include文件。includePath里面的项的写法是：includePath:[“绝对路径一”,“绝对路径二”,“绝对路径三”]
 
 
+## 修改exe数据目录
 
+### RunCode生成的exe文件
 
+修改settings.json文件，可分全局和当前工程。先不考虑全局，当前工程，可以在.vscode下创建一个settings.json，作为独立配置文件，更加灵活。那如何生成该文件呢？通过Ctrl+Shift+P输入settings产生的全局配置。我们可以手动创建。
+
+### F5调试生成的.exe文件
 
 
