@@ -32,8 +32,3 @@ void TestString::Test() {
     Input();
     ChageChar();
 }
-
-int main() {
-    TestString ts;
-    ts.Test();
-}

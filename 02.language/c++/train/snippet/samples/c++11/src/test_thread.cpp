@@ -13,8 +13,3 @@ void TestThread::run()
 {
     cout << "Hello TestThread class";
 }
-
-int main() {
-    TestThread tt;
-    tt.run();
-}

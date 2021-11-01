@@ -9,6 +9,9 @@
 				"-fdiagnostics-color=always",
 				"-g",
 				"${file}",
+				"${workspaceFolder}\\snippet\\samples\\c++11\\src\\*.cpp",
+				"${workspaceFolder}\\snippet\\samples\\c++primer\\src\\*.cpp",
+				// "${workspaceFolder}\\snippet\\samples\\c++stdlib\\*.cpp"
 				"-o",
 				"${workspaceFolder}\\snippet\\build\\debug\\${fileBasenameNoExtension}.exe",
 				"-I",
