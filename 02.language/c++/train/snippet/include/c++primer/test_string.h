@@ -6,10 +6,9 @@ public:
     TestString();
     ~TestString();
 
-    void test();
+    void Test();
 
 private:
-    void test_input();
-    void test_change_char();
-
+    void ChageChar();
+    void Input();
 };

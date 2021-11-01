@@ -78,6 +78,8 @@ A:
 特别需要注意，vscode中的.vscode需要和工程文件夹的顶级目录名并列
 ${workspaceFolder}这里是指路径到train为止，它下面就是snippet和.vscode
 
+[task和launch的配置](https://zhuanlan.zhihu.com/p/92175757)
+
 ### Windows配置
 
 [参考链接](https://code.visualstudio.com/docs/cpp/config-msvc)
@@ -108,6 +110,8 @@ ${workspaceFolder}这里是指路径到train为止，它下面就是snippet和.v
 ## c\_cpp\_properties
 
 在哪个文件里设置includePath？
+这个一般来讲是指定库文件的目录。
+而g++编译时，指定目录，需要通过task/args中的"-I" "include_path"来指定
 
 默认在用户主目录文件夹下的.vscode里面；
 

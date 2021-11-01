@@ -1,4 +1,4 @@
-// #include "../../include/c++primer/test_string.h"
+//#include "../../include/c++primer/test_string.h"
 #include "test_string.h"
 #include <iostream>
 #include <string>
@@ -9,12 +9,7 @@ TestString::TestString() {}
 
 TestString::~TestString() {}
 
-void TestString::test() {
-    test_input();
-    test_change_char();
-}
-
-void TestString::test_change_char() {
+void TestString::ChageChar() {
        string  s = "some string";
     for (decltype(s.size()) index = 0; 
         index != s.size() && !isspace(s[index]); ++index) 
@@ -25,7 +20,7 @@ void TestString::test_change_char() {
     cout << s << endl;
 }
 
-void TestString::test_input() {    
+void TestString::Input() {    
     string input;
     while (getline(cin, input)) 
     {
@@ -33,7 +28,12 @@ void TestString::test_input() {
     }   
 }
 
+void TestString::Test() {
+    Input();
+    ChageChar();
+}
+
 int main() {
     TestString ts;
-    ts.test();
+    ts.Test();
 }

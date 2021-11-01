@@ -1,10 +1,14 @@
 {
+    // "env": {
+    //     "myDefaultIncludePath": ["${workspaceFolder}", "${workspaceFolder}/include"],
+    //     "myCompilerPath": "/usr/local/bin/gcc-7"
+    //   },
+
     "configurations": [
         {
             "name": "GCC",
             "includePath": [
-                "${workspaceFolder}/snippet/include/c++primer",
-                "${workspaceFolder}/snippet/include/thread"
+                "${workspaceFolder}/**"
             ],
             "defines": [
                 "_DEBUG",

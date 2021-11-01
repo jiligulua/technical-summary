@@ -10,7 +10,11 @@
 				"-g",
 				"${file}",
 				"-o",
-				"${workspaceFolder}\\snippet\\build\\debug\\${fileBasenameNoExtension}.exe"
+				"${workspaceFolder}\\snippet\\build\\debug\\${fileBasenameNoExtension}.exe",
+				"-I",
+				"${workspaceFolder}/snippet/include/c++primer",
+				"-I",
+				"${workspaceFolder}/snippet/include/c++11"
 			],
 			"options": {
 				"cwd": "${workspaceFolder}"

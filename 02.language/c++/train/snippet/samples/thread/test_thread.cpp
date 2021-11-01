@@ -1,5 +1,5 @@
 #include <iostream>
-#include "../../include/thread/test_thread.h"
+#include "test_thread.h"
 
 using namespace std;
 
