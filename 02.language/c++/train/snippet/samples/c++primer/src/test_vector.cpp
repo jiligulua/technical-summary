@@ -59,10 +59,8 @@ void test_initialize()
     vector<string> v6{10};
     cur_print<string>(v6);
 
-
     vector<string> v7{10, "hi"};
     cur_print<string>(v7);
-
 }
 
 void TestVector::Test()
