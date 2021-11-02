@@ -9,6 +9,20 @@ TestString::TestString() {}
 
 TestString::~TestString() {}
 
+void TestString::Test() {
+    // Input();
+    // ChageChar();
+    Exercise();    
+}
+
+void TestString::Input() {    
+    string input;
+    while (getline(cin, input)) 
+    {
+        cout << input << endl;
+    }   
+}
+
 void TestString::ChageChar() {
        string  s = "some string";
     for (decltype(s.size()) index = 0; 
@@ -20,15 +34,46 @@ void TestString::ChageChar() {
     cout << s << endl;
 }
 
-void TestString::Input() {    
-    string input;
-    while (getline(cin, input)) 
+void UseWhile()
+{
+    string s = "Hello, String!";
+    cout << "raw: " << s << endl;
+
+    decltype(s.size()) index = 0;
+    while(index < s.size()) 
     {
-        cout << input << endl;
-    }   
+        s[index] = 'X';
+        index++;
+    }
+        
+
+    cout << "result: " << s << endl;
 }
 
-void TestString::Test() {
-    Input();
-    ChageChar();
+void UseFor()
+{
+    string s = "Hello, String!";
+    cout << "raw: " << s << endl;
+
+    for (char &item : s) 
+        item = 'X';
+
+    cout << "result: " << s << endl;
+}
+
+void UsePunct()
+{
+    string puct = "Hello, String!";
+    
+    for(auto &item : puct)
+        item = ispunct(item) ? ' ' : item;
+
+    cout << "result of del punct : " << puct << endl;
+}
+
+void TestString::Exercise()
+{
+  UseWhile();
+  UseFor();
+  UsePunct();
 }

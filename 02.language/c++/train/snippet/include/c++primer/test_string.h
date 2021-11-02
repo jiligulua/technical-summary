@@ -8,6 +8,8 @@ public:
 
     void Test();
 
+    void Exercise();
+
 private:
     void ChageChar();
     void Input();
