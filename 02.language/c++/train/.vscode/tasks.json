@@ -11,13 +11,16 @@
 				"${file}",
 				"${workspaceFolder}\\snippet\\samples\\c++11\\src\\*.cpp",
 				"${workspaceFolder}\\snippet\\samples\\c++primer\\src\\*.cpp",
+				// "${workspaceFolder}\\snippet\\samples\\c++stdlib\\src\\*.cpp",
 				// "${workspaceFolder}\\snippet\\samples\\c++stdlib\\*.cpp"
 				"-o",
 				"${workspaceFolder}\\snippet\\build\\debug\\${fileBasenameNoExtension}.exe",
 				"-I",
 				"${workspaceFolder}/snippet/include/c++primer",
 				"-I",
-				"${workspaceFolder}/snippet/include/c++11"
+				"${workspaceFolder}/snippet/include/c++11",
+				"-I",
+				"${workspaceFolder}/snippet/include/c++stdlib"
 			],
 			"options": {
 				"cwd": "${workspaceFolder}"
