@@ -1,0 +1,88 @@
+<html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0,user-scalable=no, maximum-scale=1.0">
+  <script>
+    var msg = "";
+    (function display() {
+        try {
+			msg += "platform: ";	
+			msg += navigator.platform;
+            msg += "</br>";
+            msg += "ua: ";
+            msg += navigator.userAgent;
+            msg += "</br>";
+            msg += "screen: ";
+            msg += screen.width + "*" + screen.height;
+            msg += "</br>";
+            msg += "screen-available: ";
+            msg += screen.availWidth + "*" + screen.availHeight;
+            msg += "</br>";
+            msg += "window-inner: ";
+            msg += window.innerWidth + "*" + window.innerHeight;
+            msg += "</br>";
+            msg += "window-outer: ";
+            msg += window.outerWidth + "*" + window.outerHeight;
+            msg += "</br>";
+            msg += "document-element: ";
+            msg += document.documentElement.clientWidth + "*" + document.documentElement.clientHeight;
+            msg += "</br>";
+            //msg += "body: ";
+            //msg += document.body.clientWidth + "*" + document.body.clientHeight;
+            //msg += "</br>";
+            msg += "screen-color-depth: ";
+            msg += screen.colorDepth;
+            msg += "</br>";
+            msg += "screen-pixel-depth: ";
+            msg += screen.pixelDepth;
+            msg += "</br>";
+            msg += "device-pixel-ratio: ";
+            msg += window.devicePixelRatio ? window.devicePixelRatio : "";
+            msg += "</br>";
+            
+  
+
+
+            var plugin = navigator.plugins["Shockwave Flash"];
+            if (plugin) {
+                msg += "flash: ";
+                msg += plugin.description;
+                msg += "</br>";
+            }
+
+            msg += "character-set: " + document.characterSet;
+            msg += "</br>";
+            msg += "browser-language: " + (navigator.language || navigator.browserLanguage);
+            msg += "</br>";
+            msg += "document-element-lang: " + document.documentElement.lang;
+            msg += "</br>";
+            msg += "java-enable: " + (navigator.javaEnabled ? "1" : "0");
+            msg += "</br>";
+            if (navigator.connection) {
+                msg += "net: " + navigator.connection.effectiveType;
+                msg += "</br>";
+            }
+        } catch (e) { console.log(e); }
+    })();
+
+    function info() {
+        var element = document.createElement('p');
+        element.innerHTML = msg;
+        document.body.appendChild(element);
+    }
+	
+	window.onresize = function(){
+				var msg = "";
+				msg += "屏幕宽和高:" + screen.width + "*" + screen.height;
+				msg += "</br>inner窗口宽和高：" + window.innerWidth + "*" + window.innerHeight;
+				msg += "</br>outer窗口宽和高：" + window.outerWidth + "*" + window.outerHeight;
+				msg += "</br>文档宽和高：" + document.documentElement.clientWidth + "*" + document.documentElement.clientHeight;
+				document.getElementById("info_jb51_net").innerHTML= msg;}
+</script>
+
+<body style="margin: 0px;padding: 0px;font-size: 16px;" onload="info()">
+<!-- <body> -->
+<!-- <span id="info_jb51_net">请改变浏览器窗口大小</span> -->
+<!-- </body> -->
+
+
+</html>
