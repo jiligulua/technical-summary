@@ -106,6 +106,38 @@ void sum_intergal()
     sum_relative();
 }
 
+void sum_intergal_with_iter(int length)
+{
+    if (length <= 0)
+        return;
+    
+    vector<int> data(length, 0);
+    int i = 0;
+    generate(data.begin(), data.end(), [&i]()->int{ return i++;});
+
+    cout << "data: ";
+    for (auto item : data)
+        cout << item << " ";
+    cout << endl;
+
+    cout << "neighbor sum: ";
+    auto it = data.cbegin();
+    while (it != data.cend() && ((it + 1) != data.cend())) {
+        cout << *it + *(it + 1) << " ";
+        it += 1;
+    }
+
+    cout << endl;
+    cout << "head tail sum: ";
+    auto beg = data.cbegin();
+    auto end = data.cend();
+    decltype(end - beg) diff = end - beg;
+    while (beg != end && (end - beg >= 2)) {
+        cout << *(beg++)  + *(--end) << " ";
+    }
+    cout << endl;
+}
+
 class Sequence{
     public:
     int a;
@@ -149,26 +181,29 @@ void iter_change_item_double()
     }
 }
 
-void bin_sought() {
-    vector<int> data(10);
+void bin_sought(int length, int target) {
+    vector<int> data(length);
     int i = 0;
     generate(data.begin(), data.end(), [&i]() -> int { return i++;});
 
     auto beg = data.begin();
     auto end = data.end();
     auto mid = data.begin() + (end - beg) / 2;
-    int target = 7;
+
     while (mid != end && *mid != target) {
-        if (target <= *mid) {
+        if (target < *mid) {
             end = mid;
         } else {
             beg = mid + 1;
         }
 
-        mid = beg + (end - end) /2;
+        mid = beg + (end - beg) /2;
     }
 
-    cout << "mid content is: " << *mid << endl;
+    if (mid == data.end())  
+        cout << "can't find " << target << endl;
+    else
+        cout << "mid content is: " << *mid << endl;
 }
 
 void TestVector::Test()
@@ -180,5 +215,6 @@ void TestVector::Test()
     // test_push_back<string>("#");
     // test_push_back<int>('#');
     iter_change_item_double();
-    bin_sought();
+    bin_sought(2, 4);
+    sum_intergal_with_iter(5);
 }
