@@ -214,4 +214,15 @@
     };
 
     impl.inject(dev);
-})(__tv_fun_toolkits_dolphin_injection_param__);
+//})(__tv_fun_toolkits_dolphin_injection_param__);
+})(
+	{
+		"userAgent": "Mozilla/5.0 (Linux; Android 4.4.4; vivo Y27 Build/KTU84P) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/33.0.0.0 Mobile Safari/537.36 lite baiduboxapp/4.1.0.11 (Baidu; P1 4.4.4)",
+		"javaEnabled": false,
+		"platform": "Linux armv8l",
+		"screen": {
+			"width": 720,
+			"height": 1280
+	}
+}
+);
