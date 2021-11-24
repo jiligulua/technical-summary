@@ -20,7 +20,9 @@
 				"-I",
 				"${workspaceFolder}/snippet/include/c++",
 				"-I",
-				"${workspaceFolder}/snippet/include/c++stdlib"
+				"${workspaceFolder}/snippet/include/c++stdlib",
+				"-I",
+				"${workspaceFolder}/snippet/include",
 			],
 			"options": {
 				"cwd": "${workspaceFolder}"

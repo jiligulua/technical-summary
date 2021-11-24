@@ -1,6 +1,7 @@
 #include "test_string.h"
 #include "test_vector.h"
 #include "test_array.h"
+#include "test_operator.h"
 
 int main()
 {
@@ -12,4 +13,5 @@ int main()
 
     // TestString ts;
     // ts.Test();
+    mars::test_operator();
 }
