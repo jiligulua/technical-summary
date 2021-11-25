@@ -21,5 +21,7 @@ int main()
 
 	system("pause");
 
+	//bool is_bind_expr = is_bind_expression<decltype(f_greater)>::value;
+
 	return 0;
 }
