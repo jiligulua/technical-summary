@@ -6,4 +6,6 @@ namespace mars
 
     void test_comma();
     void test_sizeof();
+    void test_cast();
+    void test_switch();
 }

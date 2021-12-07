@@ -11,6 +11,7 @@
 				"${file}",
 				"${workspaceFolder}\\snippet\\samples\\c++\\src\\*.cpp",
 				"${workspaceFolder}\\snippet\\samples\\c++primer\\src\\*.cpp",
+				"${workspaceFolder}\\snippet\\samples\\leetcode\\src\\*.cpp",
 				// "${workspaceFolder}\\snippet\\samples\\c++stdlib\\src\\*.cpp",
 				// "${workspaceFolder}\\snippet\\samples\\c++stdlib\\*.cpp"
 				"-o",
@@ -23,6 +24,8 @@
 				"${workspaceFolder}/snippet/include/c++stdlib",
 				"-I",
 				"${workspaceFolder}/snippet/include",
+				"-I",
+				"${workspaceFolder}/snippet/samples/leetcode/include",
 			],
 			"options": {
 				"cwd": "${workspaceFolder}"

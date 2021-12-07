@@ -7,6 +7,8 @@ namespace mars
     {
         test_comma();
         test_sizeof();
+        test_cast();
+        test_switch();
     }
 
     void test_comma()
@@ -61,5 +63,52 @@ namespace mars
         cout << "sizeof(float): " << sizeof(float) << endl;
         cout << "sizeof(double): " << sizeof(double) << endl;
         cout << "sizeof(long double): " << sizeof(long double) << endl;
+    }
+
+    void test_cast() 
+    {
+        int i;
+        double d;
+        const string *ps;
+        char a = 'a';
+        char *pc = &a;
+        void *pv;
+
+        pv = static_cast<void*>(const_cast<string*>(ps));  // pv = (void*)ps
+        i = static_cast<int>(*pc); //i = int(*pc);
+
+        // 一般转换为void*，之后可再复原回来
+        pv = static_cast<void*>(&d);//pv = &d; 
+
+        // 为运算对象的位模式提供较低层次上的重新解释
+        pc = reinterpret_cast<char*>(pv);  // pc = (char*) pv;
+    }
+
+    void test_switch()
+    {
+        char c = 'b';
+        int acnt = 0,bcnt = 0,ccnt = 0,ecnt = 0,dcnt = 0;
+        switch(c) {
+            case 'a':
+                ++acnt;
+            case 'b':
+                ++bcnt;
+            case 'c':
+                ++ccnt;
+            case 'd':
+                ++dcnt;
+            case 'e':
+                ++ecnt;
+        }
+
+        string str = "ab";
+        int str_cnt = 0;
+        switch(str.length()) {
+            case 2:
+                ++str_cnt;
+                break;
+            default:
+                ;
+        }
     }
 }
