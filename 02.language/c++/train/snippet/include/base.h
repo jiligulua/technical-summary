@@ -6,5 +6,6 @@
 #include <functional>
 #include <iterator>
 #include <numeric>
+#include <iostream>
 
 using namespace std;

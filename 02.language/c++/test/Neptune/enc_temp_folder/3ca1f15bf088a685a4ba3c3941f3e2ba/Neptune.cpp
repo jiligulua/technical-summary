@@ -11,7 +11,20 @@ using namespace std;
 #include "test_array.h"
 
 
-// Lomuto-Partition 洛穆托
+int partition2(vector<int>& arr, int begin, int end)
+{
+	int pivot = arr[begin];
+	while (begin < end)
+	{
+		while (begin < end && arr[--end] >= pivot);
+		arr[begin] = arr[end];
+		while (begin < end && arr[++begin] <= pivot);
+		arr[end] = arr[begin];
+	}
+	arr[begin] = pivot;
+	return begin;
+}
+
 int partition(vector<int>& arr, int begin, int end) {
 	int pivot = arr[begin];
 	// Last position where puts the no_larger element.
@@ -27,22 +40,6 @@ int partition(vector<int>& arr, int begin, int end) {
 	swap(arr[begin], arr[pos]);
 	return pos;
 }
-
-// Hoare-Partition 霍尔
-int partition2(vector<int>& arr, int begin, int end)
-{
-	int pivot = arr[begin];
-	while (begin < end)
-	{
-		while (begin < end && arr[--end] >= pivot);
-		arr[begin] = arr[end];
-		while (begin < end && arr[++begin] <= pivot);
-		arr[end] = arr[begin];
-	}
-	arr[begin] = pivot;
-	return begin;
-}
-
 
 int main()
 {
