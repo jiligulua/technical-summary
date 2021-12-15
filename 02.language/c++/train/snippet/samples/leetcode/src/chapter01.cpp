@@ -54,7 +54,30 @@ namespace npt
     {
         
         return 0;
-    }
+    } 
+    
+    
+    // 摩尔投票法
+    // 摩尔投票算法是基于这个事实
+    // 每次从序列里选择两个不相同的数字删除掉（或称为“抵消”），
+    // 最后剩下一个数字或几个相同的数字，
+    // 就是出现次数大于总数一半的那个
+    int majorityElement2(vector<int> &nums)
+    {
+		  int a=nums[0];
+		  int sum=1;
+          for (int i = 1; i < nums.size(); i++) {
+			  if(a==nums[i]) {
+				  sum++;
+			  }else {
+				  sum--;
+				  if(sum==0) {
+					  a=nums[i+1];
+				  }
+			  }
+		  }
+          return a;
+	 }
 
     void quick_sort(vector<int> &arr, int begin, int end)
     {
@@ -105,26 +128,6 @@ namespace npt
     }
 
 
-    // 摩尔投票法
-    // 摩尔投票算法是基于这个事实
-    // 每次从序列里选择两个不相同的数字删除掉（或称为“抵消”），
-    // 最后剩下一个数字或几个相同的数字，
-    // 就是出现次数大于总数一半的那个
-    int majorityElement2(vector<int> &nums)
-    {
-		  int a=nums[0];
-		  int sum=1;
-          for (int i = 1; i < nums.size(); i++) {
-			  if(a==nums[i]) {
-				  sum++;
-			  }else {
-				  sum--;
-				  if(sum==0) {
-					  a=nums[i+1];
-				  }
-			  }
-		  }
-          return a;
-	 }
+   
 
 }

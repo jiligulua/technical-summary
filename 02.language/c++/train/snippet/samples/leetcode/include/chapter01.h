@@ -13,7 +13,4 @@ namespace npt
     void quick_sort(vector<int> &arr, int begin, int end);
     int partition_hoare(vector<int>& arr, int begin, int end);
     int partition_lomuto(vector<int>& arr, int begin, int end);
-    
-
-
 }
