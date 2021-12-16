@@ -3,6 +3,6 @@
 
 int main()
 {
-    npt::test_chapter01();
+    npt::algorithm_interview_summarize();
     return 1;
 }   
