@@ -187,4 +187,9 @@ namespace npt
             }
         }
     }
+
+    int superEggDrop(int k, int n)
+    {
+        
+    }
 }
