@@ -3,18 +3,21 @@
 #include "test_array.h"
 #include "test_operator.h"
 #include "test_sentence.h"
+#include "test_dynamic_memory.h"
+
 
 int main()
 {
-    mars::test_sentence();
+    mars::test_dynamic_memory();
+    // mars::test_sentence();
 
-    // TestArray ta;
+    // TestString ta;
     // ta.Test();
 
     // TestVector tv;
     // tv.Test();
 
-    // TestString ts;wo
-    // ts.Test();a1
+    // TestString ts;
+    // ts.Test();
     // mars::test_operator();
 }

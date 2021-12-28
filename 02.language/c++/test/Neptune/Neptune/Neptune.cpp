@@ -14,8 +14,6 @@ using namespace std;
 
 int main()
 {
-
-
 	test_np_search_n();
 	test_np_serach_n_predicat();
 

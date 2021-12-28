@@ -1,4 +1,4 @@
-//#include "../../include/c++primer/test_string.h"
+#include "base.h"
 #include "test_string.h"
 #include <iostream>
 #include <string>
@@ -9,27 +9,30 @@ TestString::TestString() {}
 
 TestString::~TestString() {}
 
-void TestString::Test() {
+void TestString::Test()
+{
     // Input();
     // ChageChar();
-    Exercise();    
+    Exercise();
 }
 
-void TestString::Input() {    
+void TestString::Input()
+{
     string input;
-    while (getline(cin, input)) 
+    while (getline(cin, input))
     {
         cout << input << endl;
-    }   
+    }
 }
 
-void TestString::ChageChar() {
-       string  s = "some string";
-    for (decltype(s.size()) index = 0; 
-        index != s.size() && !isspace(s[index]); ++index) 
-        {
-            s[index] = toupper(s[index]);
-        }
+void TestString::ChageChar()
+{
+    string s = "some string";
+    for (decltype(s.size()) index = 0;
+         index != s.size() && !isspace(s[index]); ++index)
+    {
+        s[index] = toupper(s[index]);
+    }
 
     cout << s << endl;
 }
@@ -40,12 +43,11 @@ void UseWhile()
     cout << "raw: " << s << endl;
 
     decltype(s.size()) index = 0;
-    while(index < s.size()) 
+    while (index < s.size())
     {
         s[index] = 'X';
         index++;
     }
-        
 
     cout << "result: " << s << endl;
 }
@@ -55,7 +57,7 @@ void UseFor()
     string s = "Hello, String!";
     cout << "raw: " << s << endl;
 
-    for (char &item : s) 
+    for (char &item : s)
         item = 'X';
 
     cout << "result: " << s << endl;
@@ -64,8 +66,8 @@ void UseFor()
 void UsePunct()
 {
     string puct = "Hello, String!";
-    
-    for(auto &item : puct)
+
+    for (auto &item : puct)
         item = ispunct(item) ? ' ' : item;
 
     cout << "result of del punct : " << puct << endl;
@@ -73,7 +75,7 @@ void UsePunct()
 
 void TestString::Exercise()
 {
-  UseWhile();
-  UseFor();
-  UsePunct();
+    UseWhile();
+    UseFor();
+    UsePunct();
 }
