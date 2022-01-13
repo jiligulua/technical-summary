@@ -190,6 +190,6 @@ namespace npt
 
     int superEggDrop(int k, int n)
     {
-        
+        return 0;
     }
 }

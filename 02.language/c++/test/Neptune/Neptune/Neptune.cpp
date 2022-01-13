@@ -17,6 +17,7 @@ int main()
 	test_np_search_n();
 	test_np_serach_n_predicat();
 
+	test_array();
 	test_multi_array();
 	test_multi_array_using();
 

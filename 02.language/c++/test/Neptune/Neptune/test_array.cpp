@@ -66,4 +66,13 @@ void test_multi_array_using()
 	cout << endl;
 }
 
-
+void test_array()
+{
+	cout << "wait for input string:\n";
+	char* pcz1 = new char[1];
+	char* pcz2 = new char[100];
+	cin >> pcz1;
+	cout << pcz1;
+	cin >> pcz2;
+	cout << pcz2;
+}

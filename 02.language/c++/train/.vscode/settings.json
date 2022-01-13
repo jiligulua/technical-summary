@@ -5,6 +5,11 @@
         "functional": "cpp",
         "vector": "cpp",
         "string": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "new": "cpp",
+        "memory": "cpp",
+        "fstream": "cpp",
+        "iosfwd": "cpp",
+        "sstream": "cpp"
     }
 }
