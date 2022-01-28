@@ -10,6 +10,7 @@
         "memory": "cpp",
         "fstream": "cpp",
         "iosfwd": "cpp",
-        "sstream": "cpp"
+        "sstream": "cpp",
+        "numeric": "cpp"
     }
 }

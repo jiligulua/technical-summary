@@ -9,17 +9,25 @@ using namespace std;
 #include "non_mutate.h"
 #include "test_non_mutate.h"
 #include "test_array.h"
+#include "dynamic_program.h"
+#include "sequential_contain.h"
 
 
 
 int main()
 {
-	test_np_search_n();
-	test_np_serach_n_predicat();
+	//test_np_search_n();
+	//test_np_serach_n_predicat();
 
-	test_array();
-	test_multi_array();
-	test_multi_array_using();
+	//test_array();
+	//test_multi_array();
+	//test_multi_array_using();
+
+	//npt::DynamicProgram dp;
+	//dp.runSamples();
+
+	npt::ContainTest ct;
+	ct.test();
 
 	system("pause");
 

@@ -1,7 +1,13 @@
 #pragma once
+namespace npt
+{ 
+	class DynamicProgram
+	{
+	public:
+		void runSamples();
 
+	private:
+		int dropEggStep(int egg, int num);
+	};
 
-namespace mars
-{
-	void test_diagnoal();
 }
