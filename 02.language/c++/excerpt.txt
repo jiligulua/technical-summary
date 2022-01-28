@@ -1,0 +1,19 @@
+---
+STL之--插入迭代器（back_inserter,inserter,front_inserter的区别）
+除了普通迭代器，C++标准模板库还定义了几种特殊的迭代器，分别是插入迭代器、流迭代器、反向迭代器和移动迭代器，定义在<iterator>头文件中，下面主要介绍三种插入迭代器（back_inserter,inserter,front_inserter）的区别。
+首先，什么是插入迭代器？插入迭代器是指被绑定在一个容器上，可用来向容器插入元素的迭代器。
+back_inserter：创建一个使用push_back的迭代器
+inserter：此函数接受第二个参数，这个参数必须是一个指向给定容器的迭代器。元素将被插入到给定迭代器所表示的元素之前。
+front_inserter：创建一个使用push_front的迭代器（元素总是插入到容器第一个元素之前）
+由于list容器类型是双向链表，支持push_front和push_back操作，因此选择list类型来试验这三个迭代器。
+
+list<int> lst = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+list<int> lst2 ={10}, lst3={10},lst4={10};
+copy(lst.cbegin(), lst.cend(), back_inserter(lst2));
+//lst2包含10,1,2,3,4,5,6,7,8,9
+copy(lst.cbegin(), lst.cend(), inserter(lst3, lst3.begin()));
+//lst3包含1,2,3,4,5,6,7,8,9,10
+copy(lst.cbegin(), lst.cend(), front_inserter(lst4));
+//lst4包含9,8,7,6,5,4,3,2,1,10
+
+---

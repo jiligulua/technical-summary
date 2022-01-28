@@ -6,4 +6,5 @@ namespace mars
     void testDp();
 
     void testTriangle();
+    void testFibonacci();
 }

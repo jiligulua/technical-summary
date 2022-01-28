@@ -14,14 +14,18 @@ namespace mars
 
     private:
         void initialize_data();
-        unsigned calculate_max_sum(unsigned i, unsigned j);
+        unsigned max_sum(unsigned i, unsigned j);
+        unsigned max_sum_save(unsigned i, unsigned j);
+        unsigned max_sum_nonrecur();
+        unsigned max_sum_nonrecur_space_optimize();
 
     private:
         // shared_ptr<int [][MAX_ROW]> raw_data_;
         // shared_ptr<int [][MAX_ROW]> max_data_;
 
         unsigned data_[MAX_ROW][MAX_ROW];
-        unsigned max_sum_[MAX_ROW][MAx_ROW];
+        unsigned max_sum_[MAX_ROW][MAX_ROW];
         unsigned row_;
+        unsigned * p_max_sum_;
     };
 }
