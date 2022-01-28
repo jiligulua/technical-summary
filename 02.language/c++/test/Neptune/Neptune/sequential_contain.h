@@ -5,7 +5,10 @@
 #include <string>
 #include <iostream>
 #include <forward_list>
+<<<<<<< HEAD
 #include <queue>
+=======
+>>>>>>> d566399bfeb6ac7e1f83f3d2b6d4c49986ff0150
 
 
 using namespace std;
@@ -13,7 +16,10 @@ using namespace std;
 
 namespace npt
 {
+<<<<<<< HEAD
 	class Calendar;
+=======
+>>>>>>> d566399bfeb6ac7e1f83f3d2b6d4c49986ff0150
 	class Student
 	{
 	public:
@@ -52,12 +58,15 @@ namespace npt
 		void test943_44();
 		void test945();
 		void test947();
+<<<<<<< HEAD
 		void test949();
 		void test950();
 		void test951();
 
 		void testDeque();
 		void testAdapter();
+=======
+>>>>>>> d566399bfeb6ac7e1f83f3d2b6d4c49986ff0150
 
 
 	};
@@ -96,6 +105,7 @@ namespace npt
 	}
 
 	
+<<<<<<< HEAD
 	class Calendar
 	{
 	public:
@@ -106,4 +116,7 @@ namespace npt
 		unsigned month;
 		unsigned date;
 	};
+=======
+
+>>>>>>> d566399bfeb6ac7e1f83f3d2b6d4c49986ff0150
 }
