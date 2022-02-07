@@ -1,0 +1,10 @@
+^D:\WORKSPACE\TECHNICAL-SUMMARY\02.LANGUAGE\C++\CMAKE\DEMO\CMAKEFILES\906688EADFC4057D065F207AB36EFC3D\GENERATE.STAMP.RULE
+setlocal
+D:\tools\cmake-3.19.2-win64-x64\bin\cmake.exe -SD:/workspace/technical-summary/02.language/c++/cmake/demo -BD:/workspace/technical-summary/02.language/c++/cmake/demo --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file D:/workspace/technical-summary/02.language/c++/cmake/demo/mars.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

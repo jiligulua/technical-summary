@@ -1,0 +1,3 @@
+D:/workspace/technical-summary/02.language/c++/cmake/demo/CMakeFiles/main.dir
+D:/workspace/technical-summary/02.language/c++/cmake/demo/CMakeFiles/ALL_BUILD.dir
+D:/workspace/technical-summary/02.language/c++/cmake/demo/CMakeFiles/ZERO_CHECK.dir
