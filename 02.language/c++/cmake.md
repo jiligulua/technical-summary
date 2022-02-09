@@ -32,6 +32,8 @@
 		cmake ../src_dir # run CMake to configure the project and generate a native build system，即生成Makefile
 		cmake --build . # Then call that build system to actually compile/link the project， 其功能等同于直接make  
 
+		[实践结果]: 执行cmake ../src_dir之后，就会产生可执行文件，也可以使用cmake --build .产生可执行文件
+
 
 # 2添加版本号和配置文件头文件
 
@@ -213,3 +215,147 @@
 
 		"${PROJECT_BINARY_DIR}" # 表示可执行文件所在目录
 		"${PROJECT_SOURCE_DIR}" # 表示源文件所在目录
+		${CMAKE_CURRENT_SOURCE_DIR} # 表示当前CMakeLists.txt所在目录
+
+
+### 2.1.6 `include_directories`
+
+- 语法
+
+		include_directories ([AFTER|BEFORE] [SYSTEM] dir1 [dir2 ...])
+
+
+将指定目录添加到编译器的头文件搜索路径之下，指定的目录被解释成当前源码路径的相对路径。
+
+`大白话`：就是添加头文件头目录，这样在源码代码中就可以直接使用头文件，而不用指定层次关系。
+
+默认情况下，include_directories命令会将目录添加到列表最后，可以通过命令设置`CMAKE_INCLUDE_DIRECTORIES_BEFORE`变量为ON来改变它默认行为，将目录添加到列表前面。也可以在每次调用`include_directories`命令时使用AFTER或BEFORE选项来指定是添加到列表的前面或者后面。如果使用SYSTEM选项，会把指定目录当成系统的搜索目录。该命令作用范围只在当前的CMakeLists.txt。
+
+
+
+		#CMakeLists.txt
+		cmake_minimum_required(VERSION 3.18.2)
+		project(include_directories_test)
+		
+		include_directories(sub) 
+		include_directories(sub2) #默认将sub2添加到列表最后
+		include_directories(BEFORE sub3) #可以临时改变行为，添加到列表最前面
+		
+		get_property(dirs DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
+		message(">>> include_dirs=${dirs}") #打印一下目录情况
+		
+		set(CMAKE_INCLUDE_DIRECTORIES_BEFORE ON) #改变默认行为，默认添加到列表前面
+		include_directories(sub4)
+		include_directories(AFTER sub5) #可以临时改变行为，添加到列表的最后
+		get_property(dirs DIRECTORY ${CMAKE_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
+		message(">>> SET DEFAULT TO BEFORE, include_dirs=${dirs}")
+
+
+		
+		#输出
+		>>> include_dirs=/XXX/XXX/sub3;/XXX/XXX/sub;/XXX/XXX/sub2
+		>>> SET DEFAULT TO BEFORE, include_dirs=/XXX/XXX/sub4;/XXX/XXX/sub3;/XXX/XXX/sub;/XXX/XXX/sub2;/XXX/XXX/sub5
+		
+
+[参考1](https://www.jianshu.com/p/e7de3de1b0fa)
+
+
+
+### 2.1.7 `target_link_libraries`
+
+
+### 2.1.8 `add_library`
+
+- 语法
+
+		add_library(<name> [STATIC | SHARED | MODULE]
+				            [EXCLUDE_FROM_ALL]
+				            source1 [source2 ...])
+
+
+
+说明：生成库文件  
+
+`<name>` ：库的名字，直接写名字即可，不要写lib，会自动加上前缀的哈。
+[STATIC | SHARED | MODULE] ：类型有三种。
+
+
+		SHARED,动态库
+		STATIC,静态库
+		MODULE,在使用 dyld 的系统有效,如果不支持 dyld,则被当作 SHARED 对待。
+
+
+`EXCLUDE_FROM_ALL`：这个库不会被默认构建，除非有其他的组件依赖或者手工构建。
+
+- 案例1
+
+		# sub/CMakeLists.txt
+		cmake_minimum_required(VERSION 3.10.2)
+		project(sub)
+		add_library(sub test.cpp)
+
+		生成libsub.a库文件
+	
+- 案例2
+
+
+		SET(LIBHELLO_SRC hello.c)
+		ADD_LIBRARY(hello SHARED ${LIBHELLO_SRC})
+		ADD_LIBRARY(hello_static STATIC ${LIBHELLO_SRC})
+
+
+		注意，一般我们使用的静态库/动态库只是后缀名不同而已，上面构建的libhello.so与libhello_static.a，显然名字不同哦。这时你会有一个想法，那我把hello_static改成hello，结果是不可行的，静态库无法构建。重名会忽略第二条指令。
+
+		解决方法：改libhello_static.a的属性–输出名字
+
+		SET_TARGET_PROPERTIES(hello_static PROPERTIES OUTPUT_NAME "hello")
+	
+	- 关于动态库版本
+
+		
+			#VERSION 指代动态库版本,SOVERSION 指代 API 版本。
+			SET_TARGET_PROPERTIES(hello PROPERTIES VERSION 1.2 SOVERSION 1)
+
+			[实践]不管你的动态库版本是什么，对外调用总是libxxx.so。
+	
+		
+[参考](https://blog.csdn.net/weixin_39956356/article/details/100504979)
+
+## 2.3 CEF案例分析
+
+- `add_subdirectory`
+
+	- 语法：
+
+			add_subdirectory (source_dir [binary_dir] [EXCLUDE_FROM_ALL])
+			添加一个子目录并构建该子目录，一般为.a库文件或独立的可执行文件
+	
+	- 命令解析：
+	
+			source_dir
+			必选参数。该参数指定一个子目录，子目录下应该包含CMakeLists.txt文件和代码文件。子目录可以是相对路径也可以是绝对路径，如果是相对路径，则是相对当前目录的一个相对路径。
+
+			binary_dir
+			可选参数。该参数指定一个目录，用于存放输出文件。可以是相对路径也可以是绝对路径，如果是相对路径，则是相对当前输出目录的一个相对路径。如果该参数没有指定，则默认的输出目录使用source_dir。
+
+			EXCLUDE_FROM_ALL
+			可选参数。当指定了该参数，则子目录下的目标不会被父目录下的目标文件包含进去，父目录的CMakeLists.txt不会构建子目录的目标文件，必须在子目录下显式去构建。例外情况：当父目录的目标依赖于子目录的目标，则子目录的目标仍然会被构建出来以满足依赖关系（例如使用了target_link_libraries）。
+			(大白话)：添加该参数后，只能子目录自己显示构建。若是父目录依赖于子目录的目标话，仍然会构建。
+
+[参考](https://www.jianshu.com/p/07acea4e86a3)
+	
+	- 案例：
+
+			# Include application targets.
+			# Comes from the <target>/CMakeLists.txt file in the current directory.
+			# TODO: Change these lines to match your project target when you copy this file.
+			if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests")
+			  add_subdirectory(tests/cefsimple)
+			  add_subdirectory(tests/gtest)
+			  add_subdirectory(tests/ceftests)
+			endif()
+
+
+			if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests/cefclient")
+			  add_subdirectory(tests/cefclient)
+			endif()
