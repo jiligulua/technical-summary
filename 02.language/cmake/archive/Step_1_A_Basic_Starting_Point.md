@@ -1,10 +1,10 @@
-2022.2.7  
+2022.2.7 - 2022.2.9    
+[官网](https://cmake.org/cmake/help/latest/guide/tutorial/A%20Basic%20Starting%20Point.html)
 [参考1](https://cmake.org/cmake/help/latest/guide/tutorial/A%20Basic%20Starting%20Point.html)  
 [参考2](https://blog.csdn.net/yufm/article/details/107659452)
 
 # 1基本代码
 在CMakeLists.txt中，填写如下代码：
-
 
 		cmake_minimum_required(VERSION 3.10)
 		
@@ -21,6 +21,23 @@
 - 执行流程  
 在当前目录下执行cmake 给出CMakeLists.txt所在目录即可，生成Makefile文件，
 然后执行make（前提是目录切换到在Makefile所在目录），就可生成可执行文件Tutorial。
+
+## 基本代码演化
+
+		cmake_minimum_required(VERSION 3.10)
+		  
+		project(Tutorial22 VERSION 1.0)
+		
+		configure_file(TutorialConfig.h.in TutorialConfig.h)
+		
+		# specify the C++ standard
+		set(CMAKE_CXX_STANDARD 11)
+		set(CMAKE_CXX_STANDARD_REQUIRED True)
+		
+		add_executable(main main.cpp)
+		
+		target_include_directories(main PUBLIC "${PROJECT_BINARY_DIR}")
+
 
 ## 问题和解决方案
 - 存在的问题：中间文件和源文件在同一个目录中，目录结构混乱。
@@ -169,13 +186,18 @@
 		PUBLIC关键字大致装置PRIVATE + INTERFACE.
 
 
-		
 		因此,假设您正在创建一个A使用某些Boost标头的库.你会这样做:
 		
 		target_include_directories(A PRIVATE ${Boost_INCLUDE_DIRS})如果你只在源文件(.cpp)或私有头文件(.h)中使用那些Boost头.
 		target_include_directories(A INTERFACE ${Boost_INCLUDE_DIRS})如果您不在源文件中使用这些Boost标头(因此,不需要它们进行编译A).我实际上无法想到一个现实世界的例子.
 		target_include_directories(A PUBLIC ${Boost_INCLUDE_DIRS})如果你在公共头文件中使用那些Boost头文件,这些头文件包含在某些A源文件中,并且也可能包含在A库的任何其他客户端中.
 
+
+
+**推荐** 用`target_include_directories`替代`include_directories`来配置头文件
+
+[参考1](https://qa.1r1g.com/sf/ask/1837021861/)
+[参考2](https://blog.csdn.net/baidu_28558165/article/details/80637862)
 
 #### 2.1.2.2 代码示例
 
@@ -328,7 +350,7 @@
 	- 语法：
 
 			add_subdirectory (source_dir [binary_dir] [EXCLUDE_FROM_ALL])
-			添加一个子目录并构建该子目录，一般为.a库文件或独立的可执行文件
+			添加一个子目录并构建该子目录，一般为.a和.so库文件或独立的可执行文件
 	
 	- 命令解析：
 	
@@ -342,20 +364,53 @@
 			可选参数。当指定了该参数，则子目录下的目标不会被父目录下的目标文件包含进去，父目录的CMakeLists.txt不会构建子目录的目标文件，必须在子目录下显式去构建。例外情况：当父目录的目标依赖于子目录的目标，则子目录的目标仍然会被构建出来以满足依赖关系（例如使用了target_link_libraries）。
 			(大白话)：添加该参数后，只能子目录自己显示构建。若是父目录依赖于子目录的目标话，仍然会构建。
 
-[参考](https://www.jianshu.com/p/07acea4e86a3)
+			[参考](https://www.jianshu.com/p/07acea4e86a3)
 	
+
 	- 案例：
 
-			# Include application targets.
-			# Comes from the <target>/CMakeLists.txt file in the current directory.
-			# TODO: Change these lines to match your project target when you copy this file.
-			if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests")
-			  add_subdirectory(tests/cefsimple)
-			  add_subdirectory(tests/gtest)
-			  add_subdirectory(tests/ceftests)
-			endif()
+		- `add_subdirectory`
+		
+
+	
+				# Include application targets.
+				# Comes from the <target>/CMakeLists.txt file in the current directory.
+				# TODO: Change these lines to match your project target when you copy this file.
+				if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests")
+				  add_subdirectory(tests/cefsimple)
+				  add_subdirectory(tests/gtest)
+				  add_subdirectory(tests/ceftests)
+				endif()
+	
+	
+				if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests/cefclient")
+				  add_subdirectory(tests/cefclient)
+				endif()
+
+		- `set(CMAKE_CONFIGURATION_TYPES Debug Release)`
+
+		
+
+				# Only generate Debug and Release configuration types.
+				set(CMAKE_CONFIGURATION_TYPES Debug Release)
+
+				
+				Specifies the available build types on multi-config generators.
+				
+				This specifies what build types (configurations) will be available such as Debug, Release, RelWithDebInfo etc. This has reasonable defaults on most platforms, but can be extended to provide other build types. See also CMAKE_BUILD_TYPE for details of managing configuration data, and CMAKE_CFG_INTDIR.
+
+				[参考](https://cmake.org/cmake/help/v3.0/variable/CMAKE_CONFIGURATION_TYPES.html)
 
 
-			if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests/cefclient")
-			  add_subdirectory(tests/cefclient)
-			endif()
+		- `set_property`
+
+				# Use folders in the resulting project files.
+				set_property(GLOBAL PROPERTY OS_FOLDERS ON)
+		
+		- `set`
+		
+				set(CEF_ROOT "${CMAKE_CURRENT_SOURCE_DIR}")
+				set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CEF_ROOT}/cmake")
+
+				分别设置变量CEF_ROOT和CMAKE_MODULE_PATH， 将${CMAKE_MODULE_PATH}和"${CEF_ROOT}/cmake"用;连接起来
+

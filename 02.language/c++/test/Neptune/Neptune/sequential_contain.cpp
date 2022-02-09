@@ -1,8 +1,5 @@
 #include "sequential_contain.h"
-<<<<<<< HEAD
 #include <sstream>
-=======
->>>>>>> d566399bfeb6ac7e1f83f3d2b6d4c49986ff0150
 
 
 namespace npt
@@ -61,14 +58,12 @@ namespace npt
 		test943_44(); 
 		test945();
 		test947();
-<<<<<<< HEAD
+
 		test949();
 		test950();
 		test951();
 		testDeque();
 		testAdapter();
-=======
->>>>>>> d566399bfeb6ac7e1f83f3d2b6d4c49986ff0150
 	}
 
 
@@ -400,7 +395,7 @@ namespace npt
 		string num;
 		string chars;
 
-<<<<<<< HEAD
+
 		string::size_type pos = 0;
 		while ((pos = str.find_first_of(digital, pos)) != string::npos)
 		{
@@ -421,8 +416,14 @@ namespace npt
 
 		string numbers("0123456789"), name("r2d2");
 		auto pos2 = numbers.find(name); // string::npos 
-		int pos3 = pos2; // string::npos 
+		auto pos3 = pos2; // string::npos 
 
+		pos2 = str.find_first_of(digital, 0);
+		while ( pos2 != string::npos) 
+		{
+			num.append(1, str[pos2]);
+
+		}
 
 	}
 
@@ -542,14 +543,8 @@ namespace npt
 		string date = sperateCalendar();
 		
 		cout << "year:" << year << ", month:" << month << ", date:" << date << endl;
-=======
-		string::size_type pos = str.find_first_of(digital, 0);
-		while ( pos != string::npos) 
-		{
-			num.append(1, str[pos]);
 
-		}
->>>>>>> d566399bfeb6ac7e1f83f3d2b6d4c49986ff0150
+
 	}
 
 }
