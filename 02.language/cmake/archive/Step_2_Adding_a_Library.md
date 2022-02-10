@@ -1,7 +1,4 @@
-[参考](https://www.cnblogs.com/standardzero/p/10793746.html)
-[参考](https://sqlpy.com/blogs/212533219)
-
-# 1完整代码
+# 1添加库的完整脚本结构
 
 		|-step2
 		|--CMakeLists.txt
@@ -183,3 +180,9 @@
 		
 		# 递归获取目录下所有的h文件
 		file(GLOB_RECURSE h_files ./*.h)
+
+# 3参考
+
+[参考1](https://cmake.org/cmake/help/latest/guide/tutorial/Adding%20a%20Library.html)  
+[参考2](https://www.cnblogs.com/standardzero/p/10793746.html)   
+[参考3](https://sqlpy.com/blogs/212533219)
