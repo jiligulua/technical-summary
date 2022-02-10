@@ -11,6 +11,7 @@ using namespace std;
 #include "test_array.h"
 #include "dynamic_program.h"
 #include "sequential_contain.h"
+#include <math.h>
 
 
 
@@ -25,6 +26,8 @@ int main()
 
 	//npt::DynamicProgram dp;
 	//dp.runSamples();
+	
+	
 
 	npt::ContainTest ct;
 	ct.test();
