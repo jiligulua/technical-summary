@@ -19,7 +19,10 @@
 			
 			project(Tutorial)
 			
+			# 设置宏变量
 			option(USE_MYMATH "Use tutorial provided math implementation" OFF)
+
+			# 根据宏变量的配置，决定是否生成库文件
 			if(USE_MYMATH)
 			  add_subdirectory(MathFunctions)
 			  list(APPEND EXTRA_LIBS MathFunctions)
@@ -33,11 +36,13 @@
 				message("option USE_MYMATH not define")
 			endif()
 
-			
+			#生成可执行文件Tutorial
 			add_executable(Tutorial tutorial.cxx)
 			
+			# 将库文件链接到Tutorial
 			target_link_libraries(Tutorial PUBLIC ${EXTRA_LIBS})
 			
+			# 添加目录文件所需要的头文件
 			target_include_directories(Tutorial PUBLIC 
 										${PROJECT_BINARY_DIR}
 										${EXTRA_INCLUDES}
@@ -57,6 +62,7 @@
 				
 				project(MathFunctions)
 				
+				# 生成默认的静态库MathFunctions，win为MathFunctions.lib, linux为libMathFunctions.a
 				add_library(MathFunctions mysqrt.cxx)
 
 
@@ -177,7 +183,3 @@
 		
 		# 递归获取目录下所有的h文件
 		file(GLOB_RECURSE h_files ./*.h)
-
-
-
-# 
