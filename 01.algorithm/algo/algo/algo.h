@@ -4,5 +4,10 @@
 #pragma once
 
 #include <iostream>
+#include <iterator>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <list>
 
-// TODO: 在此处引用程序需要的其他标头。
+
