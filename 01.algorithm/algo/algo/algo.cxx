@@ -13,6 +13,8 @@ int main()
 	mars::Test test;
 	test.testSort();
 
+
+
 	string str = "I,love,you";
 	auto iter = find(str.crbegin(), str.crend(), ',');
 	cout << "riter comma: " << *iter << endl;
@@ -35,7 +37,7 @@ int main()
 	auto last_zero = find(li.crbegin(), li.crend(), 0);
 	ostream_iterator<int> ostr_iter(cout, " ");
 	//copy(last_zero, li.cend(), ostr_iter);
-	for_each(last_zero, li.cend(), [](int i) { ostr_iter = i; });
+	//for_each(last_zero, li.cend(), [](int i) { ostr_iter = i; });
 	cout << endl;
 	cout << "last zero index is: " << *last_zero << endl;
 

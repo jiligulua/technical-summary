@@ -41,9 +41,12 @@ namespace mars
 
 
         // test45
-        vector<int> vi = {321,32,3,9,987,967, 99,8};
-        // vector<int> vi = {321,32,3};
-        printMinNumber_45(vi);
+        // vector<int> vi = {321,32,3,9,987,967, 99,8};
+        // // vector<int> vi = {321,32,3};
+        // printMinNumber_45(vi);
+
+        // getTranslationCount_46();
+        translationNum_46(16);
     }
 
     void GetMedian::Insert(int num)
@@ -465,4 +468,76 @@ namespace mars
         cout << endl;
     }
 
+    void getTranslationCount_46()
+    {
+        int count = GetTranslationCount(12258);
+    }
+
+    int GetTranslationCount(int number)
+    {
+        if (number < 0)
+            return 0;
+
+        string numberInString = to_string(number);
+        return GetTranslationCount(numberInString);
+    }
+
+    int GetTranslationCount(const string & number)
+    {
+        int length = number.length();
+        int *counts = new int[length];
+        int count = 0;
+
+        for (size_t i = length - 1; i >= 0; --i)
+        {
+            count = 0;
+            if (i < length-1)
+                count = counts[i+1];
+            else
+                count = 1;
+
+            if (i < length-1)
+            {
+                int digit1 = number[i] - '0';
+                int digit2 = number[i+1] - '0';
+                int converted = digit1*10 + digit2;
+                if (converted >= 10 && converted <=25)
+                {
+                    if (i < length-2)
+                        count += counts[i+2];
+                    else    
+                        count += 1;
+                }
+            }
+
+            counts[i] = count;
+        }
+
+        count = counts[0];
+        delete[] counts;
+
+        return count;
+    }
+
+    int translationNum_46(int num)
+    {
+        if (num < 0)
+            return 0;
+
+        string nums = to_string(num);
+        int n = nums.size();
+        int dp[11] = {0};
+    
+        for (size_t i = 1; i < n; ++i)
+        {
+            if (nums[i-1] == '0' || nums.substr(i-1, 2) > "26") {
+                dp[i] = dp[i-1];
+            } else {
+                dp[i] = dp[i-1] + dp[i-2];
+            }
+        }
+        
+        cout << "num: " << num << " it's translation count is: " << dp[n] << endl; 
+        return dp[n];
+    }
 }

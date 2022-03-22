@@ -54,4 +54,10 @@ namespace mars
     void findNthDigit_44(int n);
 
     void printMinNumber_45(vector<int> numbers);
+
+    void getTranslationCount_46();
+    int GetTranslationCount(int number);
+    int GetTranslationCount(const string & number);
+
+    int translationNum_46(int num);
 }

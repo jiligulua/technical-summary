@@ -10,7 +10,7 @@ message("cxx file is ${cxx_file}")
 message("cxx header is ${cxx_header}")
 
 # 将源代码添加到此项目的可执行文件。
-add_executable (algo ${cxx_file} ${cxx_header})
+add_executable (algo ${cxx_file} ${cxx_header} "avl.cxx")
 
 
 
