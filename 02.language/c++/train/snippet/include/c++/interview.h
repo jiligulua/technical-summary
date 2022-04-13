@@ -60,4 +60,8 @@ namespace mars
     int GetTranslationCount(const string & number);
 
     int translationNum_46(int num);
+
+    int maxGift_47(const int *values, int rows, int cols);
+    int maxGift_47_0(const int *values, int rows, int cols);
+
 }
