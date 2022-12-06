@@ -1,0 +1,42 @@
+set nocompatible 
+
+if has("syntax")
+syntax on " 语法高亮
+endif 
+colorscheme ron "elflord ron peachpuff default 设置配色方案
+
+"detect file type
+filetype off
+"filetype plugin on
+"filetype indent on
+
+"set background=dark
+
+set tabstop=4
+set softtabstop=4
+set cindent " 使用C/C++语言的自动缩进方式
+"set cinoptions={0, 1s, t0, n-2, p2s, ()}
+set showmatch "设置匹配模式，显示匹配的括号
+set linebreak "整词换行
+set number
+set ruler
+set laststatus=2
+set previewwindow
+set history=50
+set hlsearch
+
+set rtp+=~/.vim/bundle/Vundle.vim
+
+set printoptions=paper:A4,syntax:y,wrap:y,number:y
+set printencoding=utf-8
+set printmbcharset=ISO10646
+set printmbfont=r:STSong-Light,c:yes "MSungGBK-Light"
+
+" vundle initialize
+call vundle#begin()
+
+Plugin 'VundleVim/Vundle.vim'
+Plugin 'ycm-core/YouCompleteMe'
+Plugin 'suan/vim-instant-markdown'
+
+call vundle#end()
