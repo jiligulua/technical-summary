@@ -1,0 +1,39 @@
+# 忽略所有文件和目录（当前目录不能忽略）
+*
+
+# 增加指定目录和下面所有目录
+!/algorithm/
+!/algorithm/**/
+!/language/
+!/language/**/
+!/linux/
+!/linux/**/
+!/others/
+!/others/**/
+!/tools/
+!/tools/**/
+!/design_pattern/
+!/design_pattern/**/
+!/library/
+!/library/**/
+!/machine_language/
+!/machine_language/**/
+
+# 增加指定扩展名文件和Makefile文件
+!*.cc
+!*.cpp
+!*.c
+!*.cxx
+!*.h
+!*.hpp
+
+!*.md
+!*.txt
+!.gitignore
+!*.in
+!*.mmap
+!*_bk
+!*.json
+
+# 忽略特殊文件，一般是当前目录下的文件（当前目录不能忽略）
+/ignore_file.cpp

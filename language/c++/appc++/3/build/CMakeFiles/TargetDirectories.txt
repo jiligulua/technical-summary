@@ -1,0 +1,3 @@
+/home/chris/c++/train/appc++/3/build/CMakeFiles/rebuild_cache.dir
+/home/chris/c++/train/appc++/3/build/CMakeFiles/edit_cache.dir
+/home/chris/c++/train/appc++/3/build/CMakeFiles/removerepeat.dir

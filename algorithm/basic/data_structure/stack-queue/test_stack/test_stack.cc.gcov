@@ -1,0 +1,53 @@
+        -:    0:Source:test_stack.cc
+        -:    0:Graph:test_stack.gcno
+        -:    0:Data:test_stack.gcda
+        -:    0:Runs:1
+        -:    1:#include <iostream>
+        -:    2:#include <stack>
+        -:    3:
+        -:    4:using std::stack;
+        -:    5:using std::cout;
+        -:    6:using std::endl;
+        -:    7:
+        2:    8:bool isPopOrder(const int *pPush, const int *pPop, int len) {
+        2:    9:  if (pPush == nullptr || pPop == nullptr || len <= 0)
+    #####:   10:    return false;
+        -:   11:
+        2:   12:  std::size_t i = 0;
+        2:   13:  std::size_t j = 0;
+        4:   14:  stack<int> s;
+       12:   15:  while (i != len) {
+       10:   16:    s.push(*(pPush+i++));
+       10:   17:	if (s.top() != *(pPop+j)) {
+        6:   18:	  continue;
+        -:   19:	} else {
+        4:   20:	  ++j;
+        4:   21:	  s.pop();
+        -:   22:	}
+        -:   23:  }
+        -:   24:
+        6:   25:  while (!s.empty()) {
+        5:   26:    if (s.top() == *(pPop+j)) {
+        4:   27:	  ++j;
+        4:   28:	  s.pop();
+        -:   29:	} else {
+        1:   30:	  break;
+        -:   31:	} 
+        -:   32:  }
+        -:   33:
+        2:   34:  return s.empty();
+        -:   35:}
+        -:   36:
+        1:   37:int main() {
+        1:   38:  const char *pStr = "I love c++, I love world!";
+        1:   39:  int pPush[] {1, 2, 3, 4, 5};
+        1:   40:  int pPop[] {4, 5, 3, 2, 1};
+        1:   41:  int len = 5;
+        1:   42:  cout << "is Pop order ? " << isPopOrder(pPush, pPop, len) << endl;
+        -:   43:	
+        1:   44:  int pPush2[] {1, 2, 3, 4, 5};
+        1:   45:  int pPop2[] {4, 5, 3, 1, 2};
+        1:   46:  int len2 = 5;
+        1:   47:  cout << "is Pop order ? " << isPopOrder(pPush2, pPop2, len2) << endl;
+        1:   48:  return 1;
+        -:   49:}

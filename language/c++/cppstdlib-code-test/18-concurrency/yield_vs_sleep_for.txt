@@ -1,0 +1,47 @@
+在多线程的编程中，有时候一个线程需要等待IO操作或者等待其它某个条件满足，再继续执行。为了达到这样的目的，有时我们会写出如下的代码：
+
+while(!isDone()); // Bad
+
+这样代码的问题在于，这个循环判断的操作会使得这个线程占满CPU的时间，造成资源的浪费。我们可以在一次判断结束后，让线程主动让出自己对CPU的使用权，让操作系统调度另一线程继续执行，过一会再回来判断操作是否完成，这样使得该线程的CPU占用时间大大减少。
+
+while(!isDone()) yield(); // Good
+
+1. std::this_thread::yield
+C++ 11中提供了yield函数帮助我们实现让出CPU占用的目的。
+
+void yield() noexcept;
+
+示例代码如下：
+#include
+#include
+#include
+// "busy sleep" while suggesting that other threads run
+// for a small amount of time
+void little_sleep(std::chrono::microseconds us)
+{
+auto start = std::chrono::high_resolution_clock::now();
+auto end = start + us;
+do {
+  std::this_thread::yield();
+} while (std::chrono::high_resolution_clock::now() < end);
+}
+
+int main()
+{
+auto start = std::chrono::high_resolution_clock::now();
+little_sleep(std::chrono::microseconds(100));
+auto elapsed = std::chrono::high_resolution_clock::now() - start;
+std::cout << "waited for "
+<< std::chrono::duration_cast<:chrono::microseconds>(elapsed).count()<< " microseconds\n";
+}
+
+程序输出：
+waited for 104 microseconds
+
+2. yield VS sleep
+C++11 标准库提供了yield()和sleep_for()两个方法，它们都可以达到让当前线程放弃CPU使用权的目的。
+std::this_thread::yield(): 线程调用该方法时，主动让出CPU，并且不参与CPU的本次调度，从而让其他线程有机会运行。在后续的调度周期里再参与CPU调度。
+std::sleep_for()：线程调用该方法时，同样会让出CPU，并且休眠一段时间，从而让其他线程有机会运行。等到休眠结束时，才参与CPU调度。
+两者的不同很明显：
+1、yield()方法让出CPU的时间是不确定的，并且以CPU调度时间片为单位。而sleep_for()让出CPU的时间是固定的。
+2、yield()的实现依赖于操作系统CPU调度策略，在不同的操作系统或者同一个操作系统的不同调度策略下，表现也可能是不同的。

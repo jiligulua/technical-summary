@@ -1,0 +1,70 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+AddSecondAfterFirst	sequence_container.cc	/^void AddSecondAfterFirst(forward_list<string> &sflist, string first, string second) {$/;"	f
+AddSecondAfterFirst	test_functions.cc	/^void AddSecondAfterFirst(forward_list<string> &sflist, string first, string second) {$/;"	f
+CalculateBacketContent	operation.cc	/^int CalculateBacketContent(stack<int> &snum, stack<char>& sop) {$/;"	f
+Calendar	test_str.cc	/^    Calendar(const string& calendar) {$/;"	f	class:Calendar
+Calendar	test_str.cc	/^class Calendar {$/;"	c	file:
+CompareDifContainer	sequence_container.cc	/^void CompareDifContainer(const T & t, const U & u) {$/;"	f
+CompareDifContainer	test_functions.cc	/^void CompareDifContainer(const T & t, const U & u) {$/;"	f
+DoubleSpecifiedNumber	sequence_container.cc	/^void DoubleSpecifiedNumber(vector<int> &vi, int num) {$/;"	f
+DoubleSpecifiedNumber	test_functions.cc	/^void DoubleSpecifiedNumber(vector<int> &vi, int num) {$/;"	f
+DuplicateOddAndEraseEven	sequence_container.cc	/^void DuplicateOddAndEraseEven(T t) {$/;"	f
+DuplicateOddAndEraseEven	sequence_container.cc	/^void DuplicateOddAndEraseEven(forward_list<int> t) {$/;"	f
+DuplicateOddAndEraseEven	test_functions.cc	/^void DuplicateOddAndEraseEven(T t) {$/;"	f
+DuplicateOddAndEraseEven	test_functions.cc	/^void DuplicateOddAndEraseEven(forward_list<int> t) {$/;"	f
+DuplicateOddAndEraseEven2	sequence_container.cc	/^void DuplicateOddAndEraseEven2(T t) {$/;"	f
+DuplicateOddAndEraseEven2	test_functions.cc	/^void DuplicateOddAndEraseEven2(T t) {$/;"	f
+Exercise918	sequence_container.cc	/^void Exercise918() {$/;"	f
+Exercise918	test_functions.cc	/^void Exercise918() {$/;"	f
+FindEveryItemExclude	test_str.cc	/^void FindEveryItemExclude(const string &str, const string &sets) {$/;"	f
+FindEveryItemInclude	test_str.cc	/^void FindEveryItemInclude(const string &str, const string &sets) {$/;"	f
+FindItem	sequence_container.cc	/^bool FindItem(Iter beg, Iter end, T t) {$/;"	f
+FindItem	test_functions.cc	/^bool FindItem(Iter beg, Iter end, T t) {$/;"	f
+FindItemIterator	sequence_container.cc	/^Iter FindItemIterator(Iter beg, Iter end, T t) {$/;"	f
+FindItemIterator	test_functions.cc	/^Iter FindItemIterator(Iter beg, Iter end, T t) {$/;"	f
+FindLongestWordWithMid	test_str.cc	/^void FindLongestWordWithMid(std::ifstream &ifs) {$/;"	f
+GetResult	operation.cc	/^int GetResult(const string& str) {$/;"	f
+MatchName	test_str.cc	/^string MatchName(string name, const string & pre, const string & post) {$/;"	f
+MatchNameByPos	test_str.cc	/^string MatchNameByPos(string name, const string & pre, const string & post) {$/;"	f
+Operator	operation.cc	/^int Operator(const char op, stack<int> &s) {$/;"	f
+Operator	operation.cc	/^void Operator(stack<char>& signs, stack<int>& num) {$/;"	f
+Print	common.h	/^void Print(Iter beg, const Iter & end) {$/;"	f
+Print	common.h	/^void Print(const T &t) {$/;"	f
+Print	common.h	/^void Print(const std::string &str) {$/;"	f
+Print	sequence_container.cc	/^void Print(Iter beg, const Iter & end) {$/;"	f
+Print	sequence_container.cc	/^void Print(const T &t) {$/;"	f
+Print	test_functions.cc	/^void Print(Iter beg, const Iter & end) {$/;"	f
+Print	test_functions.cc	/^void Print(const T &t) {$/;"	f
+PushNextOperationIdentify	operation.cc	/^void PushNextOperationIdentify(const string& str, stack<char>& s, size_t& next_pos) {$/;"	f
+RemoveEvenItem	sequence_container.cc	/^void RemoveEvenItem(T &t) {$/;"	f
+RemoveEvenItem	test_functions.cc	/^void RemoveEvenItem(T &t) {$/;"	f
+RemoveOddItem	sequence_container.cc	/^void RemoveOddItem(T &t) {$/;"	f
+RemoveOddItem	test_functions.cc	/^void RemoveOddItem(T &t) {$/;"	f
+RemoveOddItemFromForwardList	sequence_container.cc	/^void RemoveOddItemFromForwardList(forward_list<int> &ifl) {$/;"	f
+RemoveOddItemFromForwardList	test_functions.cc	/^void RemoveOddItemFromForwardList(forward_list<int> &ifl) {$/;"	f
+ReplaceStr	test_str.cc	/^void ReplaceStr(string s, const string& old_value, const string& new_value) {$/;"	f
+ReplaceStrByIndex	test_str.cc	/^void ReplaceStrByIndex(string s, const string& old_value, const string& new_value) { $/;"	f
+TestInsert	sequence_container.cc	/^void TestInsert() {$/;"	f
+TestInsert	test_functions.cc	/^void TestInsert() {$/;"	f
+TestInsert934	sequence_container.cc	/^void TestInsert934() {$/;"	f
+TestInsert934	test_functions.cc	/^void TestInsert934() {$/;"	f
+TestReplace943	sequence_container.cc	/^void TestReplace943(string s, const string & old_value, const string & new_val) {$/;"	f
+TestVector939	sequence_container.cc	/^void TestVector939() {$/;"	f
+TestVectorGross	sequence_container.cc	/^void TestVectorGross() {$/;"	f
+TransferMonth	test_str.cc	/^	unsigned TransferMonth(const string & month) {$/;"	f	class:Calendar	file:
+TransferNumber	test_str.cc	/^void TransferNumber() {$/;"	f
+day	test_str.cc	/^	unsigned day() const { return day_; }$/;"	f	class:Calendar
+day_	test_str.cc	/^    unsigned year_, month_, day_;$/;"	m	class:Calendar	file:
+main	adapter.cc	/^int main() {$/;"	f
+main	operation.cc	/^int main() {$/;"	f
+main	sequence_container.cc	/^int main() {$/;"	f
+main	test_str.cc	/^int main() {$/;"	f
+month	test_str.cc	/^	unsigned month() const { return month_; }$/;"	f	class:Calendar
+month_	test_str.cc	/^    unsigned year_, month_, day_;$/;"	m	class:Calendar	file:
+year	test_str.cc	/^	unsigned year() const { return year_; }$/;"	f	class:Calendar
+year_	test_str.cc	/^    unsigned year_, month_, day_;$/;"	m	class:Calendar	file:
