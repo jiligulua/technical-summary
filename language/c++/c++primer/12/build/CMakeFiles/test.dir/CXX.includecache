@@ -1,0 +1,24 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/chris/c++/train/primer/12/str_blob.cc
+str_blob.h
+/home/chris/c++/train/primer/12/str_blob.h
+
+/home/chris/c++/train/primer/12/str_blob.h
+memory
+-
+stdexcept
+-
+vector
+-
+string
+-
+initializer_list
+-
+

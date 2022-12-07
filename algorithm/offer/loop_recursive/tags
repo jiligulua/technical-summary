@@ -1,0 +1,22 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+CalcDiceSumByLoop	60_dice_sum_prob.cc	/^void CalcDiceSumByLoop(unsigned dice_number) {$/;"	f
+CalcDiceSumProb	60_dice_sum_prob.cc	/^void CalcDiceSumProb(unsigned number) {$/;"	f
+GetMaxGiftValue	47_gift.cc	/^int GetMaxGiftValue(const int *value, int rows, int cols) {$/;"	f
+GetMaxGiftValue2	47_gift.cc	/^int GetMaxGiftValue2(const int *values, int rows, int cols) {$/;"	f
+LongestSubstringWithoutDuplication	48_longest_sub_without_dup.cc	/^int LongestSubstringWithoutDuplication(const std::string& str) {$/;"	f
+PrintProbabilty	60_dice_sum_prob.cc	/^void PrintProbabilty(int number) {$/;"	f
+__OFFER_DICE_SUM_PROB__	60_dice_sum_prob.h	2;"	d
+calcDiceSumByLoop	60_dice_sum_prob.cc	/^void calcDiceSumByLoop(unsigned dice_number, unsigned *sum_count) {$/;"	f
+calcSum	60_dice_sum_prob.cc	/^void calcSum(unsigned base, unsigned *s) {$/;"	f
+calcSum	60_dice_sum_prob.cc	/^void calcSum(unsigned base, unsigned cur, unsigned sum, unsigned *s ) {$/;"	f
+g_maxValue	60_dice_sum_prob.cc	/^int g_maxValue = 6;$/;"	v
+getMaxMultiplyByCutRope	14_cut_rope.cc	/^int getMaxMultiplyByCutRope(int length) {$/;"	f
+main	14_cut_rope.cc	/^int main() {$/;"	f
+main	47_gift.cc	/^int main() {$/;"	f
+main	48_longest_sub_without_dup.cc	/^int main() {$/;"	f
+main	60_saizi.cc	/^int main() {$/;"	f

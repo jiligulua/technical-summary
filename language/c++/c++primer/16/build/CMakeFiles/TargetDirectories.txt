@@ -1,0 +1,3 @@
+/home/chris/c++/train/primer/16/build/CMakeFiles/rebuild_cache.dir
+/home/chris/c++/train/primer/16/build/CMakeFiles/edit_cache.dir
+/home/chris/c++/train/primer/16/build/CMakeFiles/test.dir

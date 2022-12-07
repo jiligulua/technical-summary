@@ -1,0 +1,10 @@
+Hello World!1 2 3 4 5 6 
+ptr content is: 42
+ptr content is: 43
+test weak_ptr: 42
+weak_ptr is not expired
+BStruct is deleted!
+AStruct is deleted!
+lambda: 1 3 4 6 1
+test C99 in C++11: function name: testC99 file: /home/chris/code/demo/c++/demo/train/BaseFeature.cpp line: 144
+test Printf: Hello world

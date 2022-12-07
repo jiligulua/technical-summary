@@ -1,0 +1,36 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/chris/c++/train/appc++/3/args.cc
+iostream
+-
+args.h
+/home/chris/c++/train/appc++/3/args.h
+string
+-
+person.h
+/home/chris/c++/train/appc++/3/person.h
+cxxabi.h
+-
+typeinfo
+-
+
+/home/chris/c++/train/appc++/3/args.h
+algorithm
+-
+ctime
+-
+iostream
+-
+tuple
+-
+
+/home/chris/c++/train/appc++/3/person.h
+string
+-
+
