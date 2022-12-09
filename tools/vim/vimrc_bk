@@ -35,8 +35,50 @@ set printmbfont=r:STSong-Light,c:yes "MSungGBK-Light"
 " vundle initialize
 call vundle#begin()
 
+" vim启动时提供一些辅助功能，如显示最近打开的文件，以及一个好看的图标。再次打开im可以得到一个界面，展示最近打开的文件。通过j，k可以上下移动，回车，可以进入光标所在的文件
+Plugin 'mhinz/vim-startify'
+
+" 插件nerdtree侧边树形菜单
+"Plugin 'scrooloose/nerdtree'
+Plugin 'preservim/nerdtree', {'on': 'NERDTreeToggle'}
+
+" 右侧展示文件的整体结构视图
+Plugin 'preservim/tagbar'
+
+Plugin 'godlygeek/tabular'
+Plugin 'preservim/vim-markdown'
+
 Plugin 'VundleVim/Vundle.vim'
 Plugin 'ycm-core/YouCompleteMe'
-Plugin 'suan/vim-instant-markdown'
+"Plugin 'suan/vim-instant-markdown'
+"Plugin 'jackiehan/vim-instant-markdown'
+Plugin 'iamcco/markdown-preview.nvim'
+
+" quick find
+"Plugin 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plugin 'junegunn/fzf.vim'
+Plugin 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plugin 'tracyone/fzf-funky', { 'on': 'FzfFunky' }
+
+" vim-airline底部栏, 让你更加清楚当前的操作
+Plugin 'vim-airline/vim-airline'
+Plugin 'vim-airline/vim-airline-themes'
+
+" 添加一些分割线
+Plugin 'Yggdroot/indentLine'
+
+" 在vim中光标快速移动到你的可视区域
+Plugin 'easymotion/vim-easymotion'
 
 call vundle#end()
+
+noremap <c-t> :NERDTreeToggle<cr>
+noremap <c-f> :NERDTreeFind<cr>
+noremap <c-u> :TagbarToggle<cr>
+let g:tagbar_ctags_bin='/usr/bin/ctags' " 设置ctags所在路径
+let g:tagbar_width=30 " 设置tagbar的宽度
+autocmd BufReadPost *.cpp, *.c, *.h, *.hpp, *.cc, *.cxx call tagbar#autoopen()
+
+" 使用谷歌浏览器
+let g:mkdp_brower='chromium'
+nmap <c-p> :MarkdownPreviewToggle<cr>
