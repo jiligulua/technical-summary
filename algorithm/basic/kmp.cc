@@ -90,10 +90,13 @@ int main() {
   //string s("abcababcabcabxxy");
   //string t("abcabx");
 
-  string s("HelloWorldIfindyou");
-  string t("dIf");
+  //string s("HelloWorldIfindyou");
+  //string t("dIf");
+  
+  string s("aaacaaaabexxxx");
+  string t("aaaab");
   //int pos = KmpSearch(s, t);
   int pos = KmpSimpleSearch(s, t);
 
-  cout << "子串在主串中的椅子的编号是" << pos << endl;
+  cout << "子串在主串中的椅子的编号是：" << pos << endl;
 }
