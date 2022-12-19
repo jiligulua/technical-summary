@@ -1,0 +1,75 @@
++hello
+|------build
+       |-----bin
+|------src
+       |
+       |-----main.c
+	   |-----CMakeLists.txt
+|------libhello
+       |-----hello.h
+	   |-----hello.c
+	   |-----CMakeLists.txt
+|------CMakeLists.txt
+
+
+顶层CMakeLists.txt
+cmake_minimum_required(VERSION 3.2)
+project(HELLO VERSION 1.0 LANGUAGES C CXX)
+option(TEST_DEBUG "option for debug" OFF)
+if (TEST_DEBUG)
+  add_definitions(-DTEST_DEBUG)
+endif()
+add_definitions(-DBUILD_SHARED)
+		
+add_subdirectory(src)		
+add_subdirectory(libhello)
+	
+
+src:
+CMakeLists.txt
+
+include_directories(${PROJECT_SOURCE_DIR}/libhello)
+set(APP_SRC main.c)
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
+add_executable(hello ${APP_SRC})
+target_link_libraries(hello libhello)
+
+#include <stdio.h>
+#include "hello.h"
+
+int main() {
+  hello("World");
+#ifdef TEST_DEBUG
+  printf("DEBUG\n");
+#endif
+  return 0;
+}
+
+hellolib:
+CMakeLists.txt
+
+set(LIB_SRC hello.c)
+set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
+
+if(BUILD_SHARED)
+  add_library(libhello SHARED ${LIB_SRC})
+else()
+  add_library(libhello STATIC ${LIB_SRC})
+endif()
+
+hello.h
+#ifndef MARS_HELLO_
+#define MARS_HELLO_
+
+void hello(const char* name);
+
+#endif
+
+hello.c
+
+#include "hello.h"
+#include <stdio.h>
+
+void hello(const char* name) {
+  printf("Hello %s! \n", name);
+}

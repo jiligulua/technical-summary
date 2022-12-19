@@ -37,3 +37,5 @@
 
 # 忽略特殊文件，一般是当前目录下的文件（当前目录不能忽略）
 /ignore_file.cpp
+
+/language/c++/c++primer/III_class_design_tool/13_copy_control/build/**/link.txt

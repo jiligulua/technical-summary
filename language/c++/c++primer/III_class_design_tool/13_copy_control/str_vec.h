@@ -10,9 +10,19 @@ class StrVec {
  public:
   StrVec() : elements_(nullptr), first_free_(nullptr), cap_(nullptr) {}
   StrVec(const StrVec&);
+  StrVec(std::initializer_list<std::string> il);
   StrVec& operator=(const StrVec&);
+  StrVec(StrVec&&) noexcept;
+  StrVec& operator=(StrVec&&) noexcept;
+  StrVec& operator=(std::initializer_list<std::string> il);
   ~StrVec();
   void PushBack(const std::string&);
+  void PushBack(std::string&&);
+
+  std::string& operator[](std::size_t n) { return elements_[n]; } // 注意阿：elements_是指针，并且有类型，那就可以使用内置指针的下标运算符
+  const std::string& operator[](std::size_t n) const { return elements_[n]; }
+  
+
   std::size_t Size() const { return first_free_ - elements_; }
   std::size_t Capacity() const { return cap_ - elements_; }
   std::string* Begin() const { return elements_; }

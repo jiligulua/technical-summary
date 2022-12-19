@@ -2,6 +2,7 @@
 #include <utility>
 #include <algorithm>
 #include <string>
+#include <iterator>
 
 using std::string;
 
@@ -11,8 +12,40 @@ StrVec::StrVec(const StrVec& s) {
   first_free_ = cap_ = data.second;
 }
 
+StrVec::StrVec(std::initializer_list<string> il) {
+  auto new_data = alloc_n_copy(il.begin(), il.end());
+  elements_ = new_data.first;
+  first_free_ = cap_ = new_data.second;
+}
+
 StrVec& StrVec::operator=(const StrVec& rhs) {
   auto data = alloc_n_copy(rhs.Begin(), rhs.End());
+  free();
+  elements_ = data.first;
+  first_free_ = cap_ = data.second;
+  return *this;
+}
+
+StrVec::StrVec(StrVec&& s) noexcept
+    : elements_(s.elements_)
+    , first_free_(s.first_free_)
+    , cap_(s.cap_){
+  s.elements_ = s.first_free_ = s.cap_ = nullptr;
+}
+
+StrVec& StrVec::operator=(StrVec&& rhs) noexcept {
+  if (this != &rhs) {
+    free();
+	elements_ = rhs.elements_;
+	first_free_ = rhs.first_free_;
+	cap_ = rhs.cap_;
+	rhs.elements_ = rhs.first_free_ = rhs.cap_ = nullptr; // 移动源处于可析构状态
+  }
+  return *this;
+}
+
+StrVec& StrVec::operatori=(std::initializer_list<std::string> il) {
+  auto data = check_n_alloc(il.begin(), il.end();
   free();
   elements_ = data.first;
   first_free_ = cap_ = data.second;
@@ -31,8 +64,10 @@ StrVec::alloc_n_copy(const string* b, const string* e) {
 
 void StrVec::free() {
   if (elements_) {
-    for (auto p = first_free_; p != elements_;) 
-	  alloc_.destroy(--p);
+	std::for_each(elements_, first_free_, 
+				  [](std::string& s) { alloc_.destroy(&s); }); // for_each和lambda版本， 只需要指出范围以及对范围中元素执行什么操作即可，而for版本则需程序员小心控制指针的增减
+    //for (auto p = first_free_; p != elements_;) 
+	//  alloc_.destroy(--p);
 	alloc_.deallocate(elements_, cap_ - elements_);
   }
 }
@@ -40,6 +75,11 @@ void StrVec::free() {
 void StrVec::PushBack(const std::string& rhs) {
   check_n_alloc();
   alloc_.construct(first_free_++, rhs);
+}
+
+void StrVec::PushBack(std::string&& rhs) {
+  check_n_alloc();
+  alloc_.construct(first_free_++, std::move(rhs));
 }
 
 void StrVec::Reserve(std::size_t n) {
@@ -53,15 +93,20 @@ void StrVec::reallocate(void) {
 }
 
 void StrVec::reallocate(std::size_t new_capacity) {
-  auto new_data = alloc_.allocate(new_capacity);
-  auto dest = new_data;
-  auto elem = elements_;
-  for (std::size_t i = 0; i != Size(); ++i) 
-	alloc_.construct(dest++, std::move(*elem++));
+ // auto new_data = alloc_.allocate(new_capacity);
+ // auto dest = new_data;
+ // auto elem = elements_;
+ // for (std::size_t i = 0; i != Size(); ++i) 
+ //   alloc_.construct(dest++, std::move(*elem++));
+
+  auto first = alloc_.allocate(new_capacity);
+  auto last = uninitialized_copy(std::make_move_iterator(Begin()),
+				                 std::make_move_iterator(End()),
+								 first); // 也就是说uninitialized_系列内部使用了construct函数
 
   free();
-  elements_ = new_data;
-  first_free_ = dest;
+  elements_ = first;
+  first_free_ = last;
   cap_ = elements_ + new_capacity;
 }
 

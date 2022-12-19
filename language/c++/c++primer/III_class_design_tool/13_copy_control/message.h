@@ -18,6 +18,8 @@ class Message {
 
   Message(const Message& msg);
   Message& operator=(const Message&);
+  Message(Message&& msg);
+  Message& operator=(Message&&);
   ~Message();
 
   void Save(Folder&);
@@ -30,6 +32,8 @@ class Message {
 
   // 从folders中的每个Folder中删除本Message
   void remove_from_folder();
+
+  void move_folders(Message*);
 
   string contents_;
   set<Folder*> folders_;
