@@ -1,3 +1,0 @@
-/home/chris/c++/train/appc++/build/CMakeFiles/rebuild_cache.dir
-/home/chris/c++/train/appc++/build/CMakeFiles/edit_cache.dir
-/home/chris/c++/train/appc++/build/CMakeFiles/test.dir

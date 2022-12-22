@@ -1,1 +1,1 @@
-/bin/c++    -rdynamic CMakeFiles/main.dir/main.cc.o  -o main 
+/bin/c++   -O0 -Wall -g2 -ggdb  -rdynamic CMakeFiles/main.dir/main.cc.o  -o main 

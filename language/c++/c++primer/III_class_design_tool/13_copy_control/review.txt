@@ -1,0 +1,677 @@
+cmake_minimum_required(VERSION 3.2)
+
+project(mars VERSION 1.0.0.0)
+
+set(SOURCES main_dy.cc foo.cc str_vec.cc String.cc)
+
+
+
+add_executable(dynamic_mem ${SOURCES})
+
+include_directories(./)
+
+message(${PROJECT_SOURCE_DIR})
+message(${PROJECT_BINARY_DIR})
+
+message(${mars_BINARY_DIR})
+message(${mars_SOURCE_DIR})
+#ifndef MARS_STRING_H_
+#define MARS_STRING_H_
+
+#include <memory>
+#include <utility>
+#include <iostream>
+
+class String {
+  friend std::ostream& operator<<(std::ostream&, const String&);
+ public:
+  String() : String("") {}
+  String(const char*);
+  String(const String&);
+  String& operator=(const String&);
+  String(String&&) noexcept;
+  String& operator=(String&&) noexcept;
+  ~String();
+
+  char& operator[](std::size_t n) { return elements_[n]; }
+  const char& operator[](std::size_t n) const { return elements_[n]; }
+  const char* C_Str() const { return elements_; }
+  std::size_t Size() const { return end_ - elements_; } 
+  std::size_t Length() const { return end_ - elements_; }
+
+ private:
+  void range_initializer(const char*, const char*);
+  std::pair<char*, char*> alloc_n_copy(const char*, const char*);
+  void free();
+
+  char* elements_;
+  char* end_;
+  std::allocator<char> alloc_; // 只是一个内存分配工具，没有什么神秘的。
+};
+
+#endif // MARS_STRING_H_
+#include "String.h"
+#include <algorithm>
+#include <iostream>
+
+
+String::String(const char* s) {
+  char* sl = const_cast<char*>(s);
+  while(*sl)
+	++sl;
+  range_initializer(s, sl);
+  std::cout << "constructor" << std::endl;
+}
+
+String::String(const String& rhs) {
+  range_initializer(rhs.elements_, rhs.end_);
+  std::cout << "copy constructor" << std::endl;
+}
+
+void String::range_initializer(const char* first, const char* last) {
+  auto new_str = alloc_n_copy(first, last);
+  elements_ = new_str.first;
+  end_ = new_str.second;
+}
+
+std::pair<char*, char*>
+String::alloc_n_copy(const char* b, const char* e) {
+  auto str = alloc_.allocate(e - b);
+  return {str, std::uninitialized_copy(b, e, str)};
+}
+
+String& String::operator=(const String& rhs) {
+  auto new_str = alloc_n_copy(rhs.elements_, rhs.end_);
+  free();
+  elements_ = new_str.first;
+  end_ = new_str.second;
+  std::cout << "copy-assignment" << std::endl;
+  return *this;
+}
+
+String::String(String&& rhs) noexcept
+    : elements_(rhs.elements_)
+	, end_(rhs.end_) {
+  rhs.elements_ = rhs.end_ = nullptr;	
+  std::cout << "move construct" << std::endl;
+}
+
+String& String::operator=(String&& rhs) noexcept {
+  if (this != &rhs) {
+    free();
+	elements_ = rhs.elements_; // manage old memory
+	end_ = rhs.end_; // manage old memory
+	rhs.elements_ = rhs.end_ = nullptr;
+  }
+  std::cout << "move-assignment" << std::endl;
+  return *this;
+}
+
+String::~String() {
+  free();
+  std::cout << "destructor" << std::endl;
+}
+
+void String::free() {
+  if (elements_) {
+    std::for_each(elements_, end_, [this](char& c){ alloc_.destroy(&c); });
+	alloc_.deallocate(elements_, end_-elements_);
+  }
+}
+
+std::ostream& operator<<(std::ostream& os, const String& s) {
+  os << s.C_Str();
+  return os;
+}
+#ifndef MAR_COPY_CONTROL_STR_VEC_H_
+#define MAR_COPY_CONTROL_STR_VEC_H_
+
+#include <string>
+#include <memory>
+
+using std::string;
+
+class StrVec {
+ public:
+  StrVec() : elements_(nullptr), first_free_(nullptr), cap_(nullptr) {}
+  StrVec(const StrVec&);
+  StrVec(std::initializer_list<std::string> il);
+  StrVec& operator=(const StrVec&);
+  StrVec(StrVec&&) noexcept;
+  StrVec& operator=(StrVec&&) noexcept;
+  StrVec& operator=(std::initializer_list<std::string> il);
+  ~StrVec();
+  void PushBack(const std::string&);
+  void PushBack(std::string&&);
+
+  std::string& operator[](std::size_t n) { return elements_[n]; } // 注意阿：elements_是指针，并且有类型，那就可以使用内置指针的下标运算符
+  const std::string& operator[](std::size_t n) const { return elements_[n]; }
+  
+
+  std::size_t Size() const { return first_free_ - elements_; }
+  std::size_t Capacity() const { return cap_ - elements_; }
+  std::string* Begin() const { return elements_; }
+  std::string* End() const { return first_free_; }
+
+  void Reserve(std::size_t n);
+  void Resize(std::size_t n);
+  void Resize(std::size_t n, const std::string& s);
+
+ private:
+  void check_n_alloc() {
+    if (Size() == Capacity())
+	  reallocate();
+  }
+
+  std::pair<std::string*, std::string*> alloc_n_copy(const std::string*, const std::string*);
+  void free();
+  void reallocate(void);
+  void reallocate(std::size_t new_capacity);
+
+  static std::allocator<std::string> alloc_;
+
+  std::string* elements_;
+  std::string* first_free_;
+  std::string* cap_;
+};
+
+#endif// MAR_COPY_CONTROL_STR_VEC_H_
+#include "str_vec.h"
+#include <utility>
+#include <algorithm>
+#include <string>
+#include <iterator>
+
+using std::string;
+
+StrVec::StrVec(const StrVec& s) {
+  auto data = alloc_n_copy(s.Begin(), s.End());
+  elements_ = data.first;
+  first_free_ = cap_ = data.second;
+}
+
+StrVec::StrVec(std::initializer_list<string> il) {
+  auto new_data = alloc_n_copy(il.begin(), il.end());
+  elements_ = new_data.first;
+  first_free_ = cap_ = new_data.second;
+}
+
+StrVec& StrVec::operator=(const StrVec& rhs) {
+  auto data = alloc_n_copy(rhs.Begin(), rhs.End());
+  free();
+  elements_ = data.first;
+  first_free_ = cap_ = data.second;
+  return *this;
+}
+
+StrVec::StrVec(StrVec&& s) noexcept
+    : elements_(s.elements_)
+    , first_free_(s.first_free_)
+    , cap_(s.cap_){
+  s.elements_ = s.first_free_ = s.cap_ = nullptr;
+}
+
+StrVec& StrVec::operator=(StrVec&& rhs) noexcept {
+  if (this != &rhs) {
+    free();
+	elements_ = rhs.elements_;
+	first_free_ = rhs.first_free_;
+	cap_ = rhs.cap_;
+	rhs.elements_ = rhs.first_free_ = rhs.cap_ = nullptr; // 移动源处于可析构状态
+  }
+  return *this;
+}
+
+StrVec& StrVec::operatori=(std::initializer_list<std::string> il) {
+  auto data = check_n_alloc(il.begin(), il.end();
+  free();
+  elements_ = data.first;
+  first_free_ = cap_ = data.second;
+  return *this;
+}
+
+StrVec::~StrVec() {
+  free();
+}
+
+std::pair<std::string*, std::string*> 
+StrVec::alloc_n_copy(const string* b, const string* e) {
+  auto data = alloc_.allocate(e - b);
+  return {data, uninitialized_copy(b, e, data)};// 返回构造之后的Begin和End指针 
+}
+
+void StrVec::free() {
+  if (elements_) {
+	std::for_each(elements_, first_free_, 
+				  [](std::string& s) { alloc_.destroy(&s); }); // for_each和lambda版本， 只需要指出范围以及对范围中元素执行什么操作即可，而for版本则需程序员小心控制指针的增减
+    //for (auto p = first_free_; p != elements_;) 
+	//  alloc_.destroy(--p);
+	alloc_.deallocate(elements_, cap_ - elements_);
+  }
+}
+
+void StrVec::PushBack(const std::string& rhs) {
+  check_n_alloc();
+  alloc_.construct(first_free_++, rhs);
+}
+
+void StrVec::PushBack(std::string&& rhs) {
+  check_n_alloc();
+  alloc_.construct(first_free_++, std::move(rhs));
+}
+
+void StrVec::Reserve(std::size_t n) {
+  if (n > Capacity())
+	reallocate(n);
+}
+
+void StrVec::reallocate(void) {
+  auto new_capacity = Size() ? 2 * Size() : 1;
+  reallocate(new_capacity);
+}
+
+void StrVec::reallocate(std::size_t new_capacity) {
+ // auto new_data = alloc_.allocate(new_capacity);
+ // auto dest = new_data;
+ // auto elem = elements_;
+ // for (std::size_t i = 0; i != Size(); ++i) 
+ //   alloc_.construct(dest++, std::move(*elem++));
+
+  auto first = alloc_.allocate(new_capacity);
+  auto last = uninitialized_copy(std::make_move_iterator(Begin()),
+				                 std::make_move_iterator(End()),
+								 first); // 也就是说uninitialized_系列内部使用了construct函数
+
+  free();
+  elements_ = first;
+  first_free_ = last;
+  cap_ = elements_ + new_capacity;
+}
+
+inline
+void StrVec::Resize(std::size_t n) {
+  Resize(n, "");
+}
+
+void StrVec::Resize(std::size_t n, const std::string& s) {
+  if (n > Size()) {
+    while (Size() < n)
+	  PushBack(s);
+  } else if (n < Size()) { // 目前的情况是期望值比Size小
+    while (Size() > n) // 只要是一直是这样的情况
+	  alloc_.destroy(--first_free_); // 销毁多余的对象
+  }
+}
+
+std::allocator<std::string> StrVec::alloc_;
+#ifndef MARS_COPY_CONTROL_HAS_PTR_H_
+#define MARS_COPY_CONTROL_HAS_PTR_H_
+
+#include <string>
+using std::string;
+
+
+class HasPtr {
+  public:
+	//HasPtr(const string & s = string())
+	//  : ps(new string(s))
+	//  , i(0)
+	//  , use(new std::size_t(1)) {}
+
+	HasPtr(const string & s = string())
+	  : ps(new string(s))
+	  , i(0) {}
+	  
+
+	~HasPtr();
+	
+	//HasPtr(const HasPtr & p)
+	//  : ps(p.ps)
+	//  , i(p.i)
+	//  , use(p.use) {
+	//    ++*use;
+	//  }
+
+	HasPtr(const HasPtr & p)
+	  : ps(new string(*p.ps))
+	  , i(p.i) {}
+
+	//HasPtr& operator=(const HasPtr&);
+	HasPtr& operator=(HasPtr);
+	HasPtr& operator=(const string&);
+	string& operator*();
+    bool operator<(const HasPtr&) const;
+
+  private:
+    friend void swap(HasPtr&, HasPtr&);
+
+  private:
+    string* ps;
+	int i;
+	//std::size_t* use;
+};
+
+#endif 
+#include "has_ptr.h"
+#include <iostream>
+
+using std::cout;
+using std::endl;
+
+HasPtr::~HasPtr() {
+  delete ps;
+}
+
+//HasPtr::~HasPtr() {
+//  if (--*use == 0) {
+//    delete ps;
+//	delete use;
+//  }
+//}
+
+HasPtr& HasPtr::operator=(HasPtr rhs) {
+  swap(*this, rhs);
+  return *this;
+}
+
+//HasPtr& HasPtr::operator=(const HasPtr & rhs) {
+//  ++*rhs.use;
+//  if (--*use == 0) {
+//    delete ps;
+//	delete use;
+//  }
+//
+//  ps = rhs.ps;
+//  i = rhs.i;
+//  use = rhs.use;
+//
+//  return *this;
+//}
+//
+
+HasPtr& HasPtr::operator=(const string & rhs) {
+  *ps = rhs;
+  return *this;
+}
+
+string& HasPtr::operator*() {
+  return *ps;
+}
+
+bool HasPtr::operator<(const HasPtr& rhs) const {
+  return *ps < *rhs.ps;
+}
+
+inline
+void swap(HasPtr & lhs, HasPtr & rhs) {
+  using std::swap;
+  cout << "交换 "  << *lhs.ps << "和" << *rhs.ps << endl;
+  swap(lhs.ps, rhs.ps);
+  swap(lhs.i, rhs.i);
+}
+#ifndef MARS_FOO_H
+#define MARS_FOO_H
+
+#include <vector>
+
+class Foo {
+ public:
+   Foo sorted() &&;
+   Foo sorted() const &;
+ private:
+  std::vector<int> data_;
+};
+
+#endif// MARS_FOO_H
+#include "foo.h"
+#include <algorithm>
+#include <iostream>
+
+Foo Foo::sorted() && {
+  std::cout << "右值引用" << std::endl;
+  std::sort(data_.begin(), data_.end());
+  return *this;  
+}
+
+Foo Foo::sorted() const & {
+  std::cout << "左值引用" << std::endl;
+  return Foo(*this).sorted();
+}
+
+#ifndef MARS_COPY_CONTROL_MESSAGE_H_
+#define MARS_COPY_CONTROL_MESSAGE_H_
+
+#include <string>
+#include <set>
+
+using std::string;
+using std::set;
+
+class Folder;
+
+class Message {
+  friend class Folder;
+  friend void swap(Message& lhs, Message& rhs);
+
+ public:
+  explicit Message(const string& str = "") : contents_(str) {}
+
+  Message(const Message& msg);
+  Message& operator=(const Message&);
+  Message(Message&& msg);
+  Message& operator=(Message&&);
+  ~Message();
+
+  void Save(Folder&);
+  void Remove(Folder&);
+
+ private:
+  // 拷贝构造函数、拷贝赋值运算符和析构函数所使用的工具函数
+  // 将本Message添加到指向参数的Folder中
+  void add_to_folders(const Message&);
+
+  // 从folders中的每个Folder中删除本Message
+  void remove_from_folder();
+
+  void move_folders(Message*);
+
+  string contents_;
+  set<Folder*> folders_;
+
+};
+
+#endif // MARS_COPY_CONTROL_MESSAGE_H_
+#include "message.h"
+
+Message::Message(const Message& msg) 
+    : contents_(msg.contents_)
+    , folder_(msg.folder_) {
+  add_to_folders(msg);
+}
+
+void Message::add_to_folders(const Message& msg) {
+  for (auto f : m.folders)
+	f->AddMsg(this);
+}
+
+Message::Message(Message&& msg) 
+    : contents_(std::move(msg.contents_)) {
+  move_folders(&msg);  
+}
+
+void Message::move_folders(Message* msg) {
+  folders_ = std::move(msg->folders_);
+  for (auto f : folders_) {
+    f->RemoveMsg(msg);
+	f->AddMsg(this);
+  }
+  msg->folders_.clear();
+}
+
+
+Message::~Message() {
+  remove_from_folders();
+}
+
+void Message::remove_from_folders() {
+  for (auto f : folders_)
+	f->RemoveMsg(this);
+}
+
+Message& Message::operator=(const Message& rhs) {
+  remove_from_folders();
+  contents_ = rhs.contents_;
+  folders_ = rhs.foloders_;
+  add_to_folders(rhs);
+  return *this;
+}
+
+Message& Message::operator=(Message&& rhs) {
+  if (this != &rhs) {
+    remove_from_folders();
+	contents_ = std::move(rhs.contents_);
+	move_folders(&rhs);
+  }
+  return *this;
+}
+
+void Message::Save(Folder& f) {
+  folders_.insert(&f);
+}
+
+void Message::Remove(Folder& f) {
+  folders.erase(&f);
+  f.RemoveMsg(this);
+}
+
+inline
+void swap(Message& lhs, Message& rhs) {
+  using std::swap;
+
+  for (auto f : lhs.folders_)
+	f->RemoveMsg(lhs);
+  for (auto f : rhs.folders_)
+	f->RemoveMsg(rhs);
+
+  swap(lhs.contents_, rhs.contents_);
+  swap(lhs.folders_, rhs.folders_);
+
+  for (auto f : lhs.folders_)
+	f->AddMsg(lhs);
+  for (auto f : rhs.folders_)
+	f->AddMsg(rhs);
+}
+#include "str_vec.h"
+#include <iostream>
+#include <algorithm>
+#include <vector>
+#include "String.h"
+#include "foo.h"
+
+int main(int argc, char* argv[]) {
+  using namespace std;
+//
+//  StrVec strvec; 
+//  strvec.PushBack("Hello");
+//  strvec.PushBack("Baidu");
+//  strvec.PushBack("I love you");
+//
+//  auto beg = strvec.Begin();
+//  while (beg != strvec.End())
+//    cout << *beg++ << " ";
+//  cout << endl; 
+//
+
+  std::vector<String> svec;
+  svec.push_back("Hello");
+//  svec.push_back("Baidu");
+//  svec.push_back("See");
+//  svec.push_back("you");
+//  svec.push_back("again");
+//
+
+  Foo f;
+  f.sorted();
+
+  String s("I love C++, to be a export.");
+  std::cout << s << std::endl;
+
+  return 0;
+}
+#include <iostream>
+#include <string>
+#include <set>
+#include <vector>
+#include "has_ptr.h"
+#include <algorithm>
+
+using std::cout;
+using std::endl;
+using std::string;
+using std::vector;
+using std::set;
+
+
+class Person{
+ public:
+  Person() = default;
+  Person(string n, string add) 
+		: name(n)
+		, address(add) {}
+
+ private:
+	string name;
+	string address;
+};
+
+class SalesData {
+  public:
+	SalesData() { cout << "SalesData()" << endl;}
+	SalesData(const SalesData &a) { cout << "SalesData(const SalesData &a)" << endl; }
+	~SalesData() { cout << "~SalesData()" << endl; }
+  int *p;  
+  int a[4] {1,2,3,4}; 
+};
+
+void CallSalesData(SalesData a) {
+  cout << __func__ << endl;
+  SalesData b = a;
+}
+
+int main() {
+//
+//  Person p1;
+//
+//  SalesData sd;
+//  sd.a[2] = 100;
+//
+//  SalesData sd2(sd);
+//
+//  sd2.a[2] = 1;
+//
+//  cout << sd.a[2] << " " << sd2.a[2] << endl;
+//
+//  CallSalesData(sd);
+//
+  HasPtr hp("Hello");
+  HasPtr hp2("ABC");
+
+  vector<HasPtr> vhp;
+  vhp.push_back(hp);
+  vhp.push_back(hp2);
+
+  cout << "Begin to sort" << endl;
+  std::sort(vhp.begin(), vhp.end());
+  cout << "End to sort" << endl;
+  for (auto i : vhp) 
+	cout << *i << " ";
+  cout << endl;
+
+
+  cout << "Test set ..." << endl;
+  set<int> s {1,2,6,5,4,3,2,1};
+  for (auto i : s)
+	cout << i << " ";
+  cout << endl;
+
+}

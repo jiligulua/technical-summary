@@ -1,0 +1,3 @@
+[submodule "language/c++/appc++/book_code"]
+	path = language/c++/appc++/book_code
+	url = git@github.com:qicosmos/cosmos.git

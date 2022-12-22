@@ -39,3 +39,4 @@
 /ignore_file.cpp
 
 /language/c++/c++primer/III_class_design_tool/13_copy_control/build/**/link.txt
+/tools/cmake/test/hello/build/
