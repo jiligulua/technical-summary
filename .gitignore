@@ -18,6 +18,8 @@
 !/library/**/
 !/machine_language/
 !/machine_language/**/
+!/interview/
+!/interview/**/
 
 # 增加指定扩展名文件和Makefile文件
 !*.cc
