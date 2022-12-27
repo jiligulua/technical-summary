@@ -1,0 +1,385 @@
+现代CMake是指CMake 3.x
+
+# 命令行调用简化
+
+## 古代CMake
+
+1. mkdir -p build
+2. cd build
+3. cmake .. -DCMAKE_BUILD_TYPE=Release 
+4. make -j4
+5. make install
+6. cd ..
+
+## 现代CMake
+1. cmake -B build -DCMAKE_BUILD_TYPE=Release  #  创建build目录，并执行release, -D只能在配置阶段才指定配置变量（又称缓存变量）。称为配置阶段，生成本地构建系统能识别的项目文件（Makefile或.sln）
+2. cmake --build build --parallel 4  # --build表示在build下调用make,--parallel 4 表示用4个进程来构建。称为构建阶段（build），这时才实际调用编译器来编译代码
+
+在配置阶段通过-D设置缓存变量，第二次配置时，之前的-D添加仍然保留，除非这个build目录删除掉
+
+	-DCMAKE_INSTALL_PREFIX=opt/openvdb-8.0 表示安装目录
+	-DCMAKE_BUILD_TYPE=Release 表示项目文件使用release来构建，开启全部优化，即gcc开启-O3还是-O0，通过这里的Release或Debug来完成
+
+3. sudo cmake --build build --target install  # 调用本地的构建系统执行install这个目标，即安装
+
+
+# 写法改进
+
+## 古代版写法
+
+		cmake_minimum_required(VERSION 2.8)
+		project(MyProject)
+		
+		list(APPEND CMAKE_MODULE_PATH "<path to find TBB module>")
+
+		find_package(TBB COMPONENTS tbb tbbmalloc)
+		if (NOT TBB_FOUND)
+			message(FATAL_ERROR "TBB not found")
+		endif()
+
+		add_executable(myapp myapp)
+		target_include_directories(myapp ${TBB_INCLUDE_DIRS})
+		target_compile_definitions(myapp ${TBB_DEFINITIONS})
+		target_link_libraries(myapp ${TBB_LIBRARIES})
+
+
+## 现代版写法
+
+
+		cmake_minimum_required(VERSION 3.12)
+		project(MyProject LANGUAGES CXX)
+		
+		find_package(TBB COMPONENTS tbb tbbmalloc REQUIRED)
+
+		add_executable(myapp myapp)
+		target_link_libraries(myapp TBB::tbb TBB::tbbmalloc)
+
+
+# 配置阶段选项
+
+## -D
+设置配置阶段的缓存变量
+
+## -G
+指定要用的生成器
+
+默认是Unix makefiles，一般比较常用的是Ninja，它比makefile更快
+
+ninja可以从包管理器里安装，如pip install ninja
+
+可以用-G参数改用别的生成器，例如cmake -GNinja会生成Ninja这个构建系统的构建规则。Ninja是一个高性能，跨平台的构建系统，Linux、Windows、MacOS上都可以用。
+
+事实上，MSBuild是单核心的构建系统，没法利用多核构建，所以很慢
+Makefile虽然是多核心但历史兼容原因效率一般，还要读取配置，也很慢
+而Ninja则是专为性能优化的构建系统，他和CMake结合都是行业标准了。
+性能上：Ninja > Makefile > MSBuild
+
+		$cmake -GNinja -B build
+		$time cmake --build build # 
+
+# 源代码
+
+		add_executable(main main.cpp)
+
+		或者
+		add_executable(main)
+		target_sources(main PUBLIC main.cc other.cc)  # 会产生源文件列表
+
+		或者,使用变量来存储，最好把头文件也加上
+		add_executable(main)
+		set(sources main.cc other.cc other.h) 
+		target_sources(main PUBLIC ${sources})
+
+		或者，用file, 使用GLOB值令自动查找当前目录下的指定扩展名的文件，实现批量添加源文件。
+		若是又添加文件了，但是此时GLOB并没有真正的添加，还有原来的所指定的文件，但是添加上
+		CONFIGURE_DEPENDS之后，添加新的文件就会自动更新，就会重新刷新sources内部的值。就是第二边build时会刷新sources的值
+		add_executable(main)
+		file(GLOB sources *.cc *.h)
+		file(GLOB sources CONFIGURE_DEPENDS *.cc *.h)
+		target_sources(main PUBLIC ${sources})
+		
+
+		在cmake看来，编译和链接是在一起的。
+
+		若果源码放在子文件夹里怎么办？出于管理源码的需要，如
+		mylib/
+			other.cc
+			other.h
+		CMakeLists.txt
+		main.cc
+
+
+		如下写：
+		file(GLOB sources CONFIGURE_DEPENDS *.cc *.h mylib/*.cc mylib/*.h)
+		大可不必！用aux_source_directory,自动搜索需要的文件名后缀名，如下：
+
+		add_executable(main)
+		aux_source_directory(. sources) # 把当前目录下的文件都包括进到sources
+		aux_source_directory(mylib sources) # 把mylib目录下的文件都包括进sources
+		target_sources(main PUBLIC ${sources})
+
+		进一步，还可以把GLOB换乘GLOB_RECURSE，能自动包含所有子文件夹下的文件
+		add_executable(main)
+		file(GLOB_RECUrSE sources CONFIGURE_DEPENDS *.cpp *.h) # 这样mylib下的文件也能够找到啦，它是递归地去搜索
+		target_sources(main PUBLIC ${sources})
+
+		GLOB_RECURSE的问题：会把build目录下的临时cpp文件也会加进来
+		因为cmake为了测试编译器，会生成一些临时的cpp文件，而build显然也在同一个目录下。那么里面的main函数就和我的main函数冲突了
+
+		解决方案：要么把源码统一放在src目录下，要么要求使用者不要把build放到和源码同一个目录里，大牛建议是把源代码放到src目录下。
+
+#2 项目配置变量
+
+- CMAKE_BUILD_TYPE
+构建的类型是调试模式还是发布模式。
+
+C++编译有一个优化的功能。
+CMAKE_BUILD_TYPE是CMake中一个特殊的变量，用于控制构建类型，它的值可以是如下4中：
+1. Debug调试模式，完全不优化，生成调试信息，方便调试程序
+2. Release发布模式，优化程度最高，性能最佳，但是编译比Debug慢。体积会变大，为了达到最佳的运行速度而牺牲大小。
+3. MinSizeRel最小体积发布，生成的文件比Release更小，不完全优化，加少二进制体积；为了达到最小的生成大小，而上面的优化目标不同
+4. RelWithDebInfo带调试信息发布，生成的文件比Release更大，因为带有调试的符号信息
+
+默认情况下CMAKE_BUILD_TYPE为空字符串，这时相当于Debug构建类型
+
+编写方法：
+set(CMAKE_BUILD_TYPE Release)
+
+- 各种构建模式在编译器选项上的区别
+
+在Release模式下，追求的是程序的最佳性能表现，此时编译器会对程序做最大的代码优化以达到最快运行速度，同时由于代码优化后不与源代码一致，此模式下一般会丢失大量的调试信息。
+
+1. Debug: '-O0 -g'
+2. Release: '-O3 -DNDEBUG' # -NDEBUG宏会使assert被去除掉
+3. MinSizeRel: '-Os -DNDEBUG'
+4. RelWithDebInfo: '-O2 -g -DNDEBUG'
+
+- 小技巧：设定一个变量的默认值
+
+因为默认生成的是Debug，效率很低，那么如何让CMAKE_BUILD_TYPE在用户没有指定的时候为Release，而用户指定的时候保持用户指定的值不变呢？
+
+就是说CMake默认情况下CMAKE_BUILD_TYPE是一个空字符串，因此这里通过if (NOT CMAKE_BUILD_TYPE)判断是否为空，如果空则自动设定为Release模式。
+
+大多数CMakeLists.txt的开头会有这三行，为的是让默认的构建类型为发布模型（高度优化）而不是默认的调试模式（不会优化）
+
+	
+			if (NOT CMAKE_BUILD_TYPE) 
+		      set(CMAKE_BUILD_TYPE Release)
+			endif()
+
+			以上可以说是标准模板
+
+
+- project
+
+初始化项目信息，并把当前CMakeLists.txt所在位置作为根目录
+
+		
+			project(hellocmake) # 创将一个hellocmake的项目
+
+			message("PROJECT_NAME: ${PROJECT_NAME}")
+			message("PROJECT_SOURCE_DIR: ${PROJECT_SOURCE_DIR}") 当前项目的源码目录
+			message("PROJECT_BINARY_DIR: ${PROJECT_BINARY_DIR}") 当前项目的可执行文件所在目录
+			message("CMAKE_CURRENT_SOURCE_DIR: ${CMAKE_CURRENT_SOURCE_DIR}") 
+			message("CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINANRY_DIR}")
+
+
+- 和子模块的关系：PROJECT_X_DIR和CMAKE_CURRENT_X_DIR的区别
+
+
+			PROJECT_SOURCE_DIR: 表示最近一次调用project的CMakeLists.txt所在的源码目录
+			CMAKE_CURRENT_SOURCE_DIR：表示当前CMakeLists.txt所在的源码目录
+			CMAKE_SOURCE_DIR：表示最外层CMakeLists.txt的源码根目录
+			利用PROJECT_SOURCE_DIR可以实现从子模块里获得外层目录的路径
+			不建议用CMAKE_SOURCE_DIR，那样会让我的项目无法被人作为子模块使用
+
+
+- 其他相关变量
+
+		
+			PROJECT_SOURCE_DIR:当前项目源码路径	
+			PROJECT_BINARY_DIR:当前项目输出路径
+			CMAKE_SOURCE_DIR:根项目源码路径
+			CMAKE_BINARY_DIR:根项目输出路径
+			PROJECT_IS_TOP_LEVEL:BOOL类型，表示当前项目是否是（最顶层的）根项目
+			PROJECT_NAME:当前项目名
+			CMAKE_PROJECT_NAME: 根项目的项目名
+			详见：https://cmake.org/cmake/help/latest/command/project.html
+
+
+- 流行
+现在CMake动不动就可以将当前的项目作为子模块，就可以用PROJECT_IS_TOP_LEVEL来判断是否需要配置依赖
+
+- 子模块里也可以使用project命令
+将当前目录作为一个独立的子项目，这样一来，PROJECT_SOURCE_DIR就会是子模块的源码目录而不是外层了。
+这个时候，CMake会认为这个子模块是个独立的项目，会额外做一些初始化。他的构建目录PROJECT_BINARY_DIR也会变成build/<源码相对路径>。
+这样在MSVC上也会看到build/mylib/mylib.vcxproj的生成
+
+
+- project的初始化
+
+1. LANGUAGES字段
+project(项目名 LANGUAGES 使用的语言列表...)  指定了该项目使用了哪些编程语言
+目前支持的语言包括：
+
+1. C：C语言
+2. CXX：C++语言
+3. ASM： 汇编语言
+4. Fortran：老年人的编程语言
+5. CUDA： 英伟达的CUDA（3.8版本新增）
+6. OBJC：苹果的Objective-C(3.16版本新增)
+7. OBJCXX：苹果的Objective-C++(3.16版本新增)
+
+如果不指定LANGUAGES，默认为C和CXX
+		
+			project(hellocmake LANGUAGES C CXX) # 表示两种语言都启用，就是说源码中有C和C++语言
+
+			还可这么设置：
+			project(hellocmake LANGUAGES NONE)
+			enable_language(CXX) # 逐一启动语言，这样就把它放在if语句里，从而只在某些选项开启才启用某语言之类的情况
+
+			add_executable(main main.cc)
+		
+
+- 设置C++标注：CMAKE_CXX_STANDARD变量
+
+它是一个整数，表示要用的C++标准，比如：C++17，那就设为17，需要C++23就设为23。
+CMAKE_CXX_STANDARD_REQUIRED是BOOL类型，可以为ON或OFF，默认为OFF。它表示是否一定要支持你指定的C++标准。如果为OFF则CMake检测到编译器不支持C++17时不报错，而是默默调低到C++14给我用；为ON时则发现不支持报错，更安全。
+
+			set(CMAKE_CXX_STARDARD 17)
+			set(CMAKE_CXX_STARDARD_REQUIRED ON) #通常都设置为ON
+			set(CMAKE_CXX_EXTENSIONS ON) # 对应 g++ -std=c++17， 还有一个g++ -std=gnu++17,就是带了gcc的一些私货，若是要兼容其他编译器（如MSVC）的项目，就会设为OFF，防止不小心用来GCC才有的特征。若是有msvc的项目，就一般设置为OFF，否则在MSVC上就会出错。OFF就是不让它启用gcc特有的特性。否则，就可以设置为ON。
+			这些变量要设置在project之前，这样在project时，编译就会检测这些特性，就不容易出错。
+
+
+- 常见误区：手动添加-std=c++17
+
+请勿直接修改CMAKE_CXX_FALGS来添加-std=c++17，必须使用CMake帮我封装好的CMAKE_CXX_STARDARD(从业人员告诉你的正确用法)。
+用GCC的用户手动指定了-std=c++17，让MSVC的用户怎么办？
+
+此外CMake已自动根据CMAKE_CXX_STANDARD的默认值11添加-std=c++11选项，再添加个-std=c++17选项不就冲突了码？所以，请用CMAKE_CXX_STANDARD。
+
+- project的初始化：VERSION字段
+
+project(项目名 VERSION x.y.z)可以把当前项目的版本号设定为x.y.z，之后就可以通过PROJECT_VERSION来获得当前项目的版本，如：project(hellocmake VERSION 0.2.3)
+
+1. PROJECT_VERSION_MAJOR: 获取x（主版本号）
+2. PROJECT_VERSION_MINOR: 获取y（次版本号）
+3. PROJECT_VERSION_PATCH: 获取z（补丁版本号）
+
+- 一些没什么用，但CMake官方不知为何就是提供了项目的字段
+
+1. DESCRIPTION "A free ..."
+2. HOMEPAGE_URL https://github.com/seeside-play/course
+
+若是有很多个project，就可以通过这两个变量来获得目录
+1. ${hellomake_VERSION}
+2. ${hellomake_SOURCE_DIR}
+3. ${hellomake_BINARY_DIR}
+
+- 小技巧： CMake的${}表达式可以嵌套
+如：${PROJECT_NAME}求值结果是hellocmake，那么${${PROJECT_NAME}_VERSION}相当于${hellocmake_VERSION},进一步求值的结果就是刚刚指定的0.2.3
+
+- cmake_minimum_required指定最低所需版本
+我所写的CMakeLists.txt包含了最低版本所具有的语法，若是用户的CMake小于指定版本，会出现“CMake版本不足”的提示
+官方建议加上：cmake_minimum_required(VERSION 3.15),还可通过3.15...3.20来表示最高版本不超过3.20。这会对cmake_policy有所影响。若是指定的版本太低，有些policy就不会启用。
+
+- 其他变量
+
+https//blog.csdn.net/fuyajun01/article/details/8891749
+
+##3 链接库文件
+
+### 改进mylib作为一个静态库
+
+add_library(mylib STATIC mylib.cpp)
+add_executable(main main.cpp)
+target_link_libraries(main PUBLIC mylib)
+
+
+### 动态库
+
+在运行时动态查找
+add_library(mylib SHARED mylib.cpp)
+add_executale(main main.cc)
+target_link_libraries(main PUBLIC mylib)
+
+### 改进：mylib作为对象库
+
+对象库类似于静态库，但是不生成.a文件，只由CMake记住该库生成了哪些对象文件。对象库是CMake自创的，绕开了编译器和操作系统的各种繁琐规则，保证了跨平台统一性。在自己的项目中，大佬推荐全部用对象库（OBJECT）替代静态库避免跨平台的麻烦。对象库仅仅作为组织代码的方式，而实际生成的可执行文件只有一个，减轻了部署的困难。不需要拷贝很多文件到目标机器上，它是一种代码的组织结构，轻量级。
+add_library(mylib OBJECT mylib.cpp)
+add_executale(main main.cc)
+target_link_libraries(main PUBLIC mylib)
+对象库可以指定不同的编译选项，还可绕开编译器的规则保证跨平台是统一的
+
+
+静态库的麻烦：GCC编译器自作聪明，会自动删除没有引用符号的那些对象。就是在没有人引用相应的静态库文件时（如该文件中有一个static声明），就会将这个cpp的.o文件删除，而我就想静态初始化。不引用但也能静态初始化。而对象库可以绕开编译器的不统一，保证不会自动删除没有引用到的对象文件。 这样就可以在静态库里定义一个总类，而这个总类没有出现在头文件里。这样就可以在静态初始化过程中，注册一些信息，而头文件又不用添加。
+mylib.cpp
+#include <cstdio>
+static int unused = printf("mylib initialized\n");
+
+main.cpp
+#include <cstdio>
+int main() {
+  printf("main function\n");
+}
+
+mylib initialized
+main function
+
+add_library无参数时，是静态库还是动态库？
+add_library(mylib mylib.cpp) # 没有指定STATIC还是SHARED，它默认是根据BUILD_SHARED_LIBS这个变量的值来决定是动态库还是静态库。ON则表示SHARED，OFF相当于STATIC，若未指定BUILD_SHARED_LIBS，默认是STATIC。如是看到这个定义，就可通过命令行 cmake -B build -DBUILD_SHARED_LIBS:BOOL=ON来让他全部生成动态库。
+
+小技巧：设定一个变量的默认值
+if (NOT DEFINED BUILD_SHARED_LIBS)
+  set(BUILD_SHARED_LIBS ON)
+endif()
+
+常见坑点：动态库无法链接静态库
+设置为静态库，误以为会让静态库链接到可执行文件上，若描述静态库链接到动态库上，而动态库在内存中的地址是会变化的，它在编译时会指定一个-fPIC选项，但是静态库就没有这个选项，它不想变化这个地址，而动态库却需要变化这个地址。就会出现 relocate...这类的错误提醒。
+
+解决方法：要么把静态库变成对象库，要么让静态库编译时也生成位置无关的代码（PIC），这样才能装在动态库里，代码如下：
+set(CMAKE_POSITION_INDEPENDENT_CODE ON) // 表示在它后面所有创建的对象都启动位置无关（PIC）
+add_library(otherlib STATIC otherlib.cpp)
+
+add_library(mylib SHARED mylib.cpp)
+target_link_libraries(mylib PUBLIC otherlib)
+add_executable(main main.cpp)
+target_link_libraries(main PUBLIC mylib)
+
+也可以只针对一个库，只对他启动位置无关的代码（PIC）
+add_library(otherlib STATIC otherlib.cpp) // 如果不出现IDE中，可以不用指定.h头文件，最好指定
+set_proprety(TARGET otherlib PROPRETY POSITION_INDEPENDENT_CODE ON) // 只针对otherlib库启动PIC
+
+# 4对象的属性 
+
+可以只对一个目标启动某一种属性,除了POSITION_INDEPENDENT_CODE还有哪些这样的属性？
+如：
+add_executable(main main.cpp)
+set_property(TARGET main PROPERTY CXX_STANDARD 17)
+set_property(TARGET main PROPERTY CXX_STANDARD_REQUIRED ON)
+set_property(TARGET main PROPERTY WIN32_EXECUTABLE ON)
+set_property(TARGET main PROPERTY LINK_WHAT_YOU_USE ON)
+set_property(TARGET main PROPERTY LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)  # 设置动态链接库的输出路径（默认${CMAKE_BINARY_DIR}）
+set_property(TARGET main PROPERTY ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib)  # 设置静态链接库的输出路径（默认${CMAKE_BINARY_DIR}）
+set_property(TARGET main PROPERTY RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)  # 设置可执行文件的输出路径（默认${CMAKE_BINARY_DIR}）
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

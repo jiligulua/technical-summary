@@ -1,3 +1,6 @@
 [submodule "language/c++/appc++/book_code"]
 	path = language/c++/appc++/book_code
 	url = git@github.com:qicosmos/cosmos.git
+[submodule "tools/cmake/thirdparty"]
+	path = tools/cmake/thirdparty
+	url = git@github.com:parallel101/course.git
