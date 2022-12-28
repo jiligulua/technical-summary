@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include "mylib.h"
 
 class Screen;
 class A {
@@ -39,12 +40,37 @@ class NoDefault {
   int i_;
 };
 
+class Debug {
+ public:
+  constexpr Debug(bool b = true) : hw_(b), io_(b), other_(b) {}
+  constexpr Debug(bool h, bool i, bool o) : hw_(h), io_(i), other_(o) {}
+  constexpr bool any() { return hw_ || io_ || other_; }
+
+
+ private:
+  bool hw_;
+  bool io_;
+  bool other_;
+};
+
+class Example {
+ public:
+  static double rate;
+  static std::vector<double> vec;
+};
+
+std::vector<double> Example::vec(4);
+
 int main() {
   const A a;
   fun(a);
   std::string str(9, 'c');
   std::cout << str << std::endl;
 
+  mylib_fun();
+
   NoDefault nodefault = 10;
   //std::vector<NoDefault> vec(10);
+  Example e;
+  std::cout << "size of Example::vec is " << Example::vec.size() << std::endl;;
 }
