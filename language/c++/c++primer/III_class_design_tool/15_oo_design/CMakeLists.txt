@@ -1,0 +1,13 @@
+cmake_minimum_required(VERSION 3.15)
+
+project(oo VERSION 1.0.0)
+
+message("CMAKE_SOURCE_DIR ${CMAKE_SOURCE_DIR}")
+message("PROJECT_SOURCE_DIR ${PROJECT_SOURCE_DIR}")
+file(GLOB sources CONFIGURE_DEPENDS src/*.cc src/*.h)
+
+add_executable(main ${sources})
+
+set_property(TARGET main PROPERTY RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
+#set_property(TARGET main PROPERTY RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_SOURCE_DIR}/bin)
+#set_property(TARGET main PROPERTY RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_SOURCE_DIR}/bin)
