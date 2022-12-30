@@ -404,8 +404,7 @@ set_prorperty(TARGET mylib PROPERTY ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${PROJECT_BIN
 set_prorperty(TARGET mylib PROPERTY LIBRARY_OUTPUT_DIRECTORY_DEBUG ${PROJECT_BINARY_DIR})
 
 set_prorperty(TARGET mylib PROPERTY RUNTIME_OUTPUT_DIRECTORY_RELEAE ${PROJECT_BINARY_DIR}) 
-set_prorperty(TARGET mylib PROPERTY ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${PROJECT_BINARY_DIR}) 
-set_prorperty(TARGET mylib PROPERTY LIBRARY_OUTPUT_DIRECTORY_RELEASE ${PROJECT_BINARY_DIR}) 
+set_prorperty(TARGET mylib PROPERTY ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${PROJECT_BINARY_DIR}) set_prorperty(TARGET mylib PROPERTY LIBRARY_OUTPUT_DIRECTORY_RELEASE ${PROJECT_BINARY_DIR}) 
 
 设置这么多，还挺麻烦的，这是为了伺候微软的window系统
 
@@ -595,17 +594,243 @@ Linux有时候也会安装在/opt下，不想暴露到全局的默认路径下�
 - 清除缓存，其实只需删除build/CMakeCache.txt就可以了
 若不是缓存的问题，而是中间文件有问题，还是需要删除build文件，大部分时间只要删除CMakeCache.txt就够了，就不用重新编译了嘛，那多快阿。
 
+- build/CMakeCache.txt的内容
+CMAKE_BUILD_TYPE:STRING=Release   变量名：类型=值
+
 - find_package就用到了缓存机制
+变量缓存的意义在于能够把find_package找到库文件位置等信息，储存起来。这样下次执行find_package时，就会利用上次缓存的变量，直接返回。避免重复执行cmake -B时速度变慢的问题。如：
+
+	Qt5_DIR:PATH=/usr/lib54/cmake/Qt5
+
+缓存起来，下次就不会变慢了。但也会有一个问题，比如cmake -B build之后，发现没有安装，等安装上之后，直接使用cmake --build build仍然会有问题。因为即便安装上了库，但是上一次配置时是FOUND false，缓存了没有找到库所留下的缓存标记。这个时候只需要rm -fr build/CMakeCache.txt，删除缓存文件，在执行以便cmake -B build就会再去找相应的库（如tbb）
 
 
+- 设置缓存变量
+我自己来设置缓存，不让cmake来设置。这样缓存的变量就会出现在build/CMakeCache.txt里
+
+	语法： set(变量名 "变量值" CACHE 变量类型 "注释")
+	如：
+	set(myvar "hello" CACHE STRING "this is the docstring.") // 注释就是在定义在变量上面的解释，特别注意，这里的hello是默认值，类似于C++中的static变量初始值。
+	message("myvar is ${myvar}")
+
+这个缓存的变量，如myvar在前面加上-D就是参数啦，和参数的语法一样。
+
+- 常见问题：我修改了CMakeLists.txt里的set的值，却没有更新？
+为了更新缓存变量，直接修改CMakeLists.txt里的值，没有用。因为set(...CACHE...)缓存变量已经存在，不会更新缓存的值。CMakeLists.txt里set的被认为是“默认值”，因此不会在第二次set的时候更新。
+
+	set(myvar "world" CACHE STRING "this is the docstring.") // 注释就是在定义在变量上面的解释
+	message("myvar is ${myvar}")
+
+这时，cmake -B build之后，还是原来的hello。最简单的办法就是删除文件文件，官方推荐cmake -B build -Dmyvar=world,使用-D参数来更新缓存。就是说，由用户来修改该变量
+
+- 命令行-D参数修改太硬核了，有没有图形化的缓存编辑器呢？
+在Linux中，运行ccmake -B build来启动基于终端的可视化缓存编辑菜单,上下键选择，回车确认修改。使用ccmake图形化编辑器修改变量，这样就比较轻松。按空格可以在ON和OFF之间切换，可以设置很多变量。在Windows下是cmake-gui -B build来启动图形编辑器编辑各个缓存选项，当然直接打开build/CMakeCache.txt修改后保存也是可以的。CMakeCache.txt保存为文本存储数据，就是可供用户手动编辑或第三方软件打开解析的。
+
+- 缓存变量到底该如何更新？暴力解决：删build大法
+更好的办法就是-D或ccmake -B build启动可视化编辑器，还有就是强制更新缓存
+
+	set(myvar "world" CACHE STRING "this is the docstring." FORCE) // 注释就是在定义在变量上面的解释
+
+### 缓存变量类型
+STRING:字符串，如“hello， Wrold”
+FILEPATH：文件路径，如“C:/vcpkg/scripts/buildsystems/vcpkg.cmake”
+PATH：目录路径，例如：“C:/Qt/Qt5.14.2/msvc2019_64/lib/cmake/”
+BOOL:布尔值，只有两个取值，ON或OFF
+注意：TRUE和ON等价，FALSE和OFF等价；YES和ON等价，NO和OFF等价。因为历史原因才保留TRUE和YES
 
 
+案例：添加一个BOOL类型的缓存变量，用于控制要不要开启某些特征
+
+	add_executalbe(main main.cpp)
+	set(WITH_TBB ON CACHE BOOL "set to ON to enable TBB, OFF to disable TBB")
+	if (WITH_TBB)
+		target_compile_definitions(main PUBLIC WITH_TBB)
+		find_package(TBB REQUIRED)
+		target_link_libraries(main PUBLIC TBB::tbb)
+	endif()
+	
+	那么使用：cmake -B build -DWITH_TBB:BOOL=ON(用户这样做就会开启，而OFF就会关闭)，默认是ON，这样用户就不用开启了
+
+CMake对BOOL类型缓存的set指令提供了一个简写：option
+
+	option(变量 “描述” 变量值) 等价于 set(变量名 CACHE BOOL 变量值 “描述”)和set一样，一旦定义不会去更新哦，它的本质就是set，例子如下所示：
+	option(WITH_TBB "set to ON to enable TBB, OFF to disable TBB", ON)	以下部分和上面一致
+	set(WITH_TBB ON CACHE BOOL "set to ON to enable TBB, OFF to disable TBB")
+
+	那么经典问题：option设为OFF了，为什么它还是ON呀？一旦定义后，就会放到CMakeCache.txt缓存中，再修改不会生效。
+	要改就通过命令：cmake -B build -DWITH_TBB:BOOL=OFF(这是官方推荐方法，当然也可以通过ccmake和直接修改CMakeCache.txt文件，或者说不用option，而是用set加FORCE即可始终强制更新缓存，还就是删build大法，它可以把缓存变量强制初始化为CMakeLists.txt里的值)
+
+- 绕开缓存的方法	
+使用普通变量，但仅当没有定义时设定为默认值。一般来说CMake自带的变量（如：CMAKE_BUILD_TYPE）都会这样设置。这样项目的使用者还是可以用-D来指定参数，不过会在ccmake里看不到，因为ccmake是查找缓存变量而不是普通变量
+
+	if (NOT DEFINED WITH_TBB)
+		set(WITH_TBB ON)
+	endif()
+	message("WITH_TBB: ${WITH_TBB}")
+	if (WITH_TBB)
+		...
+	endif()
+
+option的好处，是能让ccmake看到，这样设置就比较方便了，不让，就都用上面的if语句啦
+
+缓存比较坑爹，但也是有它的优点。
+
+# 8 跨平台与编译器
+如何判断不同的平台，判断不同的编译器。
+C++可以在代码中定义宏，如：#define  MY_MACRO 233，相当于在CMakeLists.txt中定义如下指令：target_compile_definitions(main PUBLIC MY_MACRO=233),它也相当于 gcc -DMY_MACRO=233，原理是一样的。
+
+- 根据不同的操作系统，把宏定义成不同的值
+使用变量：CMAKE_SYSTEM_NAME，可以为Windows，Linux，Darwin等，代码如下：
+
+	if (CMAKE_SYSTEM_NAME MATCHS "Windows")
+		target_compile_definitions(main PUBLIC MY_NAME="Bill Gates")
+	elseif (CMAKE_SYSTEM_NAME MATCHS "Linux")
+		target_compile_definitions(main PUBLIC MY_NAME="Linux Torvalds")
+	elesif (CMAKE_SYSTEM_NAME MATCHS "Darwin")
+		target_compile_definitions(main PUBLIC MY_NAME="Steve Jobs")
+	endif()
+
+CMake还提供了一些简写变量：WIN32，APPLE，UNIX，ANDROID， IOS等。虽然叫WIN32，实际上对32位Windows和64位Widnows都适用，APPLE对于所有苹果产品(MacOS或i)都为真，UNIX对于所有Unix类系统（FreeBSD, Linux, Android, MacOS, iOS）都为真，脚本如下：
+
+	if (WIN32)
+		target_compile_definitions(main PUBLIC MY_MACRO="...")
+	elseif (UNIX AND NOT APPLE)
+		target_compile_definitions(main PUBLIC MY_MACRO="...")
+	elseif (APPLE)
+		target_compile_definitions(main PUBLIC MY_MACRO="...")
+	endif()
+		
+
+- 使用生成器表达式，简化成一条指令
+语法： $<$<类型:值>:为真时的表达式>，自动进行了if判断。比如：$<$<PLATFORM_ID:Windwos>:MY_NAME="Bill Gates">,在Windows平台上会为：MY_NAME="Bill Gates"，其它平台上表现为空字符串。如下，在一行里完成上面的所有判断：
+	
+	target_compile_definitions(main PUBLIC
+		$<$<PLATFORM_ID:Windwos>:MY_NAME="Bill Gates">			
+		$<$<PLATFORM_ID:Linux,FreeBSD >:MY_NAME="Linus Torvalds">
+		$<$<PLATFORM_ID:Darwin>:MY_NAME="Steve Jobs">
+		)
+
+	如需多个平台，可以用逗号分割开
 
 
+- 判断当前用的是哪一款C++编译器
+
+	if (CMAKE_CXX_COMPILER_ID MATCHS "GNU")
+		target_compile_definitions(main PUBLIC MY_NAME="gcc")
+	elseif (CMAKE_CXX_COMPILER_ID MATCHS "NVIDIA")
+		target_compile_definitions(main PUBLIC MY_NAME="nvcc")
+	if (CMAKE_CXX_COMPILER_ID MATCHS "Clang")
+		target_compile_definitions(main PUBLIC MY_NAME="clang")
+	if (CMAKE_CXX_COMPILER_ID MATCHS "MSVC")
+		target_compile_definitions(main PUBLIC MY_NAME="msvc")
+	endif()
+
+也可以用生成器表达式判断编译器
+	
+	target_compile_definitions(main PUBLIC
+		$<$<CXX_COMPILER_ID:GNU,Clang>:MY_NAME="Open-source">			
+		$<$<CXX_COMPILER_ID:MSVC,NVIDIA>:MY_NAME="Commercial">			
+		)
+
+生成器表达式也可以做复杂的逻辑判断：
+	$<$<AND:$<CXX_COMPILER_ID:GNU,Clang>, $<PLATFORM_ID:Linux,FreeBSD>>:MY_NAME="Open-source">
+
+CMAKE还提供了一些简写变量：MSVC，CMAKE_COMPILER_IS_GNUCC 布尔变量
+
+	if (MSVC)
+		target_compile_definitions(main PUBLIC MY_NAME="MSVC")
+	elseif (CMAKE_COMPILER_IS_GNUCC)
+		target_compile_definitions(main PUBLIC MY_NAME="GCC")
+	else()
+		target_compile_definitions(main PUBLIC MY_NAME="Other compiler")
+	elseif()
+
+也可以将CMAKE_CXX_COMPILER_ID直接作为字符串变量，就是将它作为宏的一部分，这样C++代码中就可以知道了。如下：
+	target_compile_definitions(main PUBLIC MY_NAME="The ${CMAKE_CXX_COMPILER_ID} Compiler")
+	这样就实现了cmake中的变量值的内容可以通过宏定义的方式，导入到源码中，太强大了，实现了cmake和源码之间的信息通信。
+
+- 从命令行参数指定编译器
+cmake -B build -DCMAKE_CXX_COMPILER="/usr/bin/clang++", 这个必须是第一次配置build时定义才有效
+
+也可以通过环境变量CXX指定: $CXX='which clang' cmake -B build 
+
+- CMAKE_GENERATOR也可以了解一下
+message("Generator: ${CMAKE_GENERATOR}")
+message("c++ compiler: ${CMAKE_CXX_COMPILER}")
+message("c compiler: ${CMAKE_C_COMPILER}")
+
+- 分享：小彭老师使用的vimrc分享
+github.com/archibate/vimrc
+如何让vim支持cmake呢？因为使用了插件cmake4vim，输入CMake就可以完成config配置，输入CMakeBuild就能完成构建呢，CMakeRun就能够运行可执行程序。
 
 
+# 9 分支与判断
+BOOL类型的变量只有ON/OFF两种取值
+if的特点：不需要加${},会自动尝试作为变量名求值，若没有变量，就将该值当做字符串。若加上了${}，则递归将该值当变量继续展开，若找不到，就以此为值,这样就会有隐患。最好不要加 ${},防止递归展开。若使用${},需要加一个引号，防止被当作变量名,if就不会帮助自动求值。所以，还是直接写上变量名最好。
+	set(MYVAR Hello)
+	if (MYVAR MATCHES "Hello") // MATCHES表示等于的意思，
+	  message("MYVAR is Hello")
+	else()
+	  message("MYVAR is not Hello")
+	endif()
+
+# 10 变量与作用域
+
+cmake对变量的大小写敏感，cmake区分大小写。cmake指令不分大小写，但是变量名，文件名是分大小写的
+cmake除了括号之前的不分大小写，其它都分大小写。
+
+变量的传播规则：父会传给子，但子模块定义的变量，父模块是感觉不到的。子模块中的定义的同名变量会覆盖父模块。若是要将子模块中的定义的变量也能够影响到父模块，需要加PARENT_SCOPE, eg. set(MYVAR ON PARENT_SCOPE)
+缓存变量是真正的全局变量，如：set(MYVAR ON CACHE BOOL "" FORCE)，这样虽然子模块中定义了这个变量，但是父类及以上都可见，不推荐使用。
+除了父子模块之外还有哪些是带独立作用域的？
+include的XXX.cmake没有独立作用域
+add_subdirectory的CMakeLists.txt有独立作用域
+macro没有独立作用域，是因为直接插入执行的，它里面的变量会直接暴露出来。
+function有独立作用域
+（因此PARENT_SCOPE也可用于function的返回值）
+
+环境变量的访问方式： $ENV{XX}
+用${XX}访问的是局部变量，局部变量服从父子模块传播规则，还有就是访问系统的环境变量，若$ENV{PATH}就是获取PATH这个环境变量的值。
+
+缓存变量的访问方式：$CACHE{xx},缓存变量和环境变量是不论父子模块都公用的，没有域一说。eg：$CACHE{CMAKE_BUILD_TYPE}
+
+${xx}:找不到局部变量时，会自动去找缓存变量。
+因此当CMAKE_BUILD_TYPE每出现在代码里，没有被设置为set，但被-D参数固定在缓存里了。所以${CMAKE_BUILD_TYPE}自动变成$CACHE{CMAKE_BUILD_TYPE}从而找到变量。
+
+if (DEFINED XX) 判断某局部或缓存变量是否存在，eg if (DEFINED MYVAR)，还有就是要注意的，空字符串不代表变量不存在，也就是说变量可以定义空字符串，eg: set(MYVAR "") if (DEFINED MYVAR)  这里就是ON；而用 if (XX)，则表示变量有定义且不为空字符串，空字符串等价与FALSE。
 
 
+if (DEFINED ENV{xx}) 判断某环境变量是否存在，因为$ENV{XXX}代表环境变量，因此在set和if中可以用ENV{XX}来表示环境变量。eg：if (DEFINED ENV{MYVAR}),来判断是否存在MYVAR这个环境变量。还有就是set(ENV{MYVAR} "hello"),也不需要$符号。就是说用set设置变量或if判断变量时，不需要使用$符号。环境变量是分大小写的，比如：$export MYVAR=world,还有一个bash小技巧，使用env查看所有环境变量。
+
+# 11 其它小建议
+CCache：编译加速器，进行编译加速缓存，方法如下：
+把gcc -c main.cpp -o main  改为： ccache gcc -c main.cpp -o main 即可
+在CMake中可以这样启用ccache（就是给每个编译和链接的命令前面加上ccache）会缓存到/tmp/ccache中	
+CCache就是解决一改头文件，要全部重新编译的问题，哦有很麻烦的，大佬牛。
+
+find_program(CCACHE_PROGREAM ccache)
+if (CCACHE_PROGREAM)
+	message(STATUS "Found CCache: ${CCACHE_PROGREAM}")
+	set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ${CCACHE_PROGREAM})
+	set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ${CCACHE_PROGREAM})
+
+
+- 添加一个run伪目标，用于启动主程序（可执行文件）
+创建一个run伪目标，其执行main的可执行文件
+add_executable(main main.cpp)
+add_custom_target(run COMMAND $<TARGET_FILE:main>) 添加一个目标名字为run，COMMAND后面代表需要运行的命令，TARGET_FILE就是获取main可执行文件的路径
+用了生成器表达式$<TARGET_FILE:main>,会自动让run依赖与main。如是不放心有没有自动依赖，手动添加一个add_dependencies(run main)也是可以的。
+这样就可以在命令行运行cmake --build build  --target run来启动main.exe,而不必根据不同的平台，手动写出build/main或者build\main.exe
+
+- 再加一个configure伪目标，用于可视化地修改缓存变量
+CMAKE_EDIT_COMMADN即是ccmake
+这样就可以用cmake --build build --target configure来启动ccmake修改缓存了。这在Linux上相当与ccmake -B build，Windows则是cmake-gui -B build
+
+add_custom_target(run COMMAND $<TARGET_FILE:main>)
+if (CMAKE_EDIT_COMMAND)
+	add_custom_target(configure COMMAND ${CMAKE_EDIT_COMMAND} -B ${CMAKE_BINARY_DIR})
+
+
+再此，衷心感谢小彭老师的讲解。
 
 
 
