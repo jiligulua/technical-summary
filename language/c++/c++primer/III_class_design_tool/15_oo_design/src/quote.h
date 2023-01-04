@@ -40,6 +40,7 @@ class DiscQuote : public Quote {
 
 class BulkQuote : public DiscQuote {
  public:
+  using DiscQuote::DiscQuote;
   BulkQuote() = default;
   BulkQuote(const std::string& book, double sales_price, std::size_t qty, double disc)
 		: DiscQuote(book, sales_price, qty, disc) {}
