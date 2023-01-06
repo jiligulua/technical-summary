@@ -568,9 +568,13 @@ A：漏了上面的1
 	`/lib/x86_64-linux-gnu/cmake/Boost-1.71.0/BoostConfig.cmake`是在CMakeCache.txt配置，
 	
 	需要修改这个路径为:
-	`/usr/lib/boost-1.18.0/lib/cmake/BoostConfig.cmake``，这样就可以编译Boost-1.81.0了。
-	
+	`/usr/lib/boost-1.18.0/lib/cmake/Boost-1.81.0``，这样就可以编译Boost-1.81.0了。
 
+	实际是寻找如下路径的文件：
+	`/usr/lib/boost-1.18.0/lib/cmake/Boost-1.81.0/BoostConfig.cmake``，这样就可以编译Boost-1.81.0了。
+	
+	最简单的方式是在CMakeLists.txt中设置Boost_DIR，放在内存就可以了，而不在缓存文件中：
+	set(Boost_DIR "/usr/lib/boost-1.18.0/lib/cmake/Booost-1.81.0")
 
 ## 3.3 通过cmake使用dbg调试源码
 
