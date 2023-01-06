@@ -20,6 +20,8 @@
 !/machine_language/**/
 !/interview/
 !/interview/**/
+!/solar_system/
+!/solar_system/**/
 
 # 增加指定扩展名文件和Makefile文件
 !*.cc
