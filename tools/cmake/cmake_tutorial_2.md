@@ -381,7 +381,7 @@ CMake支持最多4个点分开的版本号：<major>.<minor>.<patch>.<tweak>。�
 ### find_package命令指定版本
 
 	find_package(OpenCV REQUIRED) 不限版本，事后可通过${OpenCV_VERSION}查询找版本
-	find_package(OpenCV 2.0.1 REQUIRED) >= 2.0.1
+	find_package(OpenCV 2.0.1 REQUIRED) >= 2.0. --depth=1
 	find_package(OpenCV 2.0.1 EXACT REQUIRED) == 2.0.1
 	find_package(OpenCV 2 REQUIRED)  # 以下没有写全，默认部分都为0，以下三者等价
 	find_package(OpenCV 2.0 REQUIRED) 
@@ -391,25 +391,25 @@ CMake支持最多4个点分开的版本号：<major>.<minor>.<patch>.<tweak>。�
 ## 总结
 1. 安装TBB（比如使用这种方式，安装和使用boost库，练练手）
 
-	源代码安装方式
-	cd tbb
-	./configure --prefix=/opt/tbbinstalldir
-	make -j 8
-	sudo make install
+	源代码安装方式  
+	cd tbb  
+	./configure --prefix=/opt/tbbinstalldir  
+	make -j 8  
+	sudo make install  
 
 
 2. 在项目里使用TBB：
 
-	cd yourapp
-	cmake -B build -DTBB_DIR=/opt/tbbinstalldir/lib/cmake/TBB
-	cmake --build build --parallel 8
+	cd yourapp  
+	cmake -B build -DTBB_DIR=/opt/tbbinstalldir/lib/cmake/TBB  
+	cmake --build build --parallel 8  
 
 3. CMakeLists.txt这样写
 
-	project(yourapp)
-	add_executable(yourapp yourmain.cpp)
-	find_package(TBB CONFIG REQUIRED COMPONENTS tbb)
-	target_link_libraries(yourapp PUBLIC TBB::tbb)
+	project(yourapp)  
+	add_executable(yourapp yourmain.cpp)  
+	find_package(TBB CONFIG REQUIRED COMPONENTS tbb)  
+	target_link_libraries(yourapp PUBLIC TBB::tbb)  
 
 
 4. 古代CMake常见问题
@@ -488,45 +488,92 @@ A：漏了上面的1
 # 3 实践
 ## 3.1 编译、引入和使用tbb库
 
+	# 编译和安装TBB
+	git clone git@github.com:wjakob/tbb.git --depth=1
+	cmake -B build -DCMAKE_INSTALL_PREFIX=/opt/tbb
+	cmake --build build --parallel 8
+	sudo --build build --target install
+
+	# 引用TBB到项目
+	find_package(TBB CONFIG REQUIRED COMPONENTS tbb)
+    target_link_libraries(main PUBLIC TBB::tbb)
+
+	# 配置和编译工程
+	cd yourapp  
+	cmake -B build -DTBB_DIR=/opt/tbb/lib/cmake/TBB  
+	cmake --build build --parallel 8  
+
+	# 源代码
+	#include<tbb/parallel_for.h>
+	tbb::parallel_for(0, 100, [](int i) {  
+		printf("%d\n", i)  
+		});  
+	
+
+	按以上顺序编写第一次顺序通过，第二发现了错误
+	仍然按以上配置来了一边，发现如下(原因是
+	CMakeCache.txt中已经指定了TBB_DIR，根据从中指示的路径找对应的.cmake脚本，
+	在脚本中找到查找include，发现是绝对路径中缺少/usr，添加之后就通过了)
+
+		
+
+		CMake Error in CMakeLists.txt:
+		  Imported target "TBB::tbb" includes non-existent path
+		
+		    "/include"
+		
+		in its INTERFACE_INCLUDE_DIRECTORIES. Possible reasons include:
+		
+		* The path was deleted, renamed, or moved to another location.
+		
+		* An install or uninstall procedure did not complete successfully.
+		
+		  * The installation package was faulty and references files it does not
+		  provide.
+		
+
+
 ## 3.2 编译、引入和使用boost库
+	
+	https://boostorg.jfrog.io/artifactory/main/release/1.81.0/source/boost_1_81_0.tar.bz2
+	./bootstrap.sh # 生成b2程序
+	./b2 toolset=gcc link=static runtime-link=shared threading=multi variant=debug # 编译生成.a文件
+	sudo ./b2 install --prefix=/usr/lib/boost-1.81.0 # 安装
+
+	cmake -B build
+	cmake --build build
+	sudo cmake --build build --target install
+
+	出现错误如下：
+	Make Error at earth/CMakeLists.txt:10 (find_package):
+	Could not find a configuration file for package "Boost" that is compatible
+	with requested version "1.81.0".
+	
+	The following configuration files were considered but not accepted:
+	
+	  /lib/x86_64-linux-gnu/cmake/Boost-1.71.0/BoostConfig.cmake, version: 1.71.0
+	  /usr/lib/x86_64-linux-gnu/cmake/Boost-1.71.0/BoostConfig.cmake, version: 1.71.0
+		
+		
+		
+	-- Configuring incomplete, errors occurred!
+	See also "/home/chris/technical-summary/solar_system/build/CMakeFiles/CMakeOutput.log".
+	
+	有此可见
+	Ubuntu默认提供了Boost-1.71.0的cmake脚本，并没有提供Boost-1.81.0。
+	而事实上，install之后，对应的cmake脚本是在：
+	/usr/lib/boost-1.18.0/lib/cmake下。
+
+	在cmake -B build时，是根据CMakeCache.txt来进行配置的，这里指出的:
+	`/lib/x86_64-linux-gnu/cmake/Boost-1.71.0/BoostConfig.cmake`是在CMakeCache.txt配置，
+	
+	需要修改这个路径为:
+	`/usr/lib/boost-1.18.0/lib/cmake/BoostConfig.cmake``，这样就可以编译Boost-1.81.0了。
+	
+
 
 ## 3.3 通过cmake使用dbg调试源码
 
 ## 3.4 core dump能够跟踪出错处
 
 ## 3.5 完成归并代码
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
