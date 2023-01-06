@@ -15,8 +15,8 @@ using std::vector;
 
 int main(int argc, char* argv[]) {
   // test merge-sort
-//  vector<int> ivec {75, 34, 24, 43, 91, 63, 36, 12, 3, 52};
-//  mercury::MergeSort merge_sort;
+  vector<int> ivec {75, 34, 24, 43, 91, 63, 36, 12, 3, 52};
+  mercury::MergeSort merge_sort;
 //  vector<int>&& merge_data = merge_sort.Sort(ivec);
 //  asteroid::print(merge_data);
   
