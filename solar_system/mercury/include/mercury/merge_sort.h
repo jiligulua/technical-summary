@@ -7,19 +7,29 @@ namespace mercury {
 
 class MergeSort {
  public:
-  std::vector<int> Sort(const std::vector<int>& src);  
+  void Sort(std::vector<int>& src);  
+  int InverseCount(const std::vector<int> &data);
 
  private:
-  void sort_core(const std::vector<int>& src, 
-				 std::vector<int>& tmp, 
+  void sort_core(std::vector<int>& src, 
 				 std::size_t start, 
 				 std::size_t end);
 
-  void merge(const std::vector<int>& src,
-			 std::vector<int>& tmp,
+  void merge(std::vector<int>& src,
 			 std::size_t start,
 			 std::size_t middle,
 			 std::size_t end);
+
+	int inverse_count_core(std::vector<int> &data, 
+												int start,
+												int end);
+
+	int merge_inverse(std::vector<int> &data, 
+										int start,
+										int middle,
+										int end);
+
+  
 };
 
 } // namespace mercury

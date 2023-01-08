@@ -3,22 +3,30 @@ using std::cout; using std::endl;
 
 #include <string>
 using std::string;
-
+#include <tuple>
 #include <vector>
 using std::vector;
 
 #include <tbb/parallel_for.h>
 #include <boost/container_hash/hash.hpp>
 
-#include <mercury/merge_sort.h>
 #include <asteroid/simple_print.h>
+#include <mercury/merge_sort.h>
+#include <mercury/task_list.h>
 
 int main(int argc, char* argv[]) {
   // test merge-sort
-  vector<int> ivec {75, 34, 24, 43, 91, 63, 36, 12, 3, 52};
+  //vector<int> ivec {75, 34, 24, 43, 91, 63, 36, 12, 3, 52};
+  //vector<int> ivec {5, 4, 3, 2, 1};
+  //asteroid::print(ivec);
   mercury::MergeSort merge_sort;
-//  vector<int>&& merge_data = merge_sort.Sort(ivec);
-//  asteroid::print(merge_data);
+  //merge_sort.Sort(ivec);
+	
+	vector<int> ivec {7, 5, 6, 4};
+	int inverse_count = merge_sort.InverseCount(ivec);
+	std::cout << "Inverse count is " << inverse_count << std::endl;
+
+  asteroid::print(ivec);
   
   tbb::parallel_for(0, 10, [](int i) { std::cout << i << " ";});
   std::cout << std::endl;
@@ -27,8 +35,21 @@ int main(int argc, char* argv[]) {
 
   boost::hash<std::string> string_hash;
   std::size_t h = string_hash("Hash me");
-
   std::cout << "Hash me: " << h << std::endl;
-
   std::cout << "We see again." << std::endl;
+
+	int data[] = {1, 2, 4, 7, 11, 15};
+	auto ret = mercury::GetItemsFromSum(15, data, 6);
+	if (std::get<0>(ret)) 
+		cout << "tow number is " << data[std::get<1>(ret)] << " and " << data[std::get<2>(ret)] << std::endl;
+
+	auto ret2 = mercury::GetSerial(15);
+	if (std::get<0>(ret2)) {
+		std::cout << "has serials" << std::endl;
+		auto items = std::get<1>(ret2);
+		for (const auto &vec : items) {
+			std::for_each(vec.cbegin(), vec.cend(), [](int i) { std::cout << i << " "; });
+			std::cout << std::endl;
+		}
+	}
 }
