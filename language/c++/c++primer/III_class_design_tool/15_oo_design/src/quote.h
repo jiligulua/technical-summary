@@ -1,7 +1,13 @@
 #ifndef MARS_OO_QUOTE_H_
 #define MARS_OO_QUOTE_H_
-#include <string>
+
 #include <iostream>
+#include <string>
+#include <memory>
+#include <utility>
+
+namespace mars {
+
 
 class Quote {
  public:
@@ -13,6 +19,12 @@ class Quote {
   std::string bookno() const { return bookno_; }
   virtual double net_price(std::size_t n) const { return n * price_; }
   virtual void Debug() { std::cout << bookno_ << " " << price_ << std::endl; }
+
+  // 从当前对象里new一份新的对象
+  virtual Quote* Clone() const & { return new Quote(*this); } 
+  
+  // 从当前对象里new一份新的对象
+  virtual Quote* Clone() && { return new Quote(std::move(*this)); }
   virtual ~Quote() = default;
 
  private:
@@ -41,9 +53,6 @@ class DiscQuote : public Quote {
 class BulkQuote : public DiscQuote {
  public:
   using DiscQuote::DiscQuote;
-  BulkQuote() = default;
-  BulkQuote(const std::string& book, double sales_price, std::size_t qty, double disc)
-		: DiscQuote(book, sales_price, qty, disc) {}
 
   double net_price(std::size_t n) const override {
     if (n > min_qty_) 
@@ -51,15 +60,19 @@ class BulkQuote : public DiscQuote {
 	else 
 	  return n * price_;
   }
+
+  // 从当前对象里new一份新的对象
+  virtual BulkQuote* Clone() const & { return new BulkQuote(*this); } 
+  
+  // 从当前对象里new一份新的对象
+  virtual BulkQuote* Clone() && { return new BulkQuote(std::move(*this)); }
 };
 
 
-double print_total(std::ostream& os, const Quote& quote, std::size_t n) {
-  double ret = quote.net_price(n);
-  os << "ISBN: " << quote.bookno() << " # sold: " << n << " total due: " << ret << std::endl;
-  return ret;
-}
+double print_total(std::ostream& os, const Quote& quote, std::size_t n); 
 
+
+} // namespace mars
 
 
 #endif // MARS_OO_QUOTE_H_

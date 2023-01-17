@@ -577,7 +577,14 @@ A：漏了上面的1
 	set(Boost_DIR "/usr/lib/boost-1.18.0/lib/cmake/Booost-1.81.0")
 
 ## 3.3 通过cmake使用dbg调试源码
+   只要指定编译类型为Debug，就可以源码调试，若是不指定，虽然也是默认为Debug，但是并没有符号文件，在gdb时不能够加载源代码，方法如下：
+
+	cmake -B build -DCMAKE_BUILD_TYPE=Debug	
+	cmake --build build
 
 ## 3.4 core dump能够跟踪出错处
+	该方法有助于即时发现崩溃信息，需要区分Debug和RelWithDebugInfo。前者在开发机上执行，后者在用户机上运行。
+
 
 ## 3.5 完成归并代码
+

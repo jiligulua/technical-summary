@@ -9,6 +9,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake;${CMAKE_MODULE_PATH}")
 set(Boost_DIR "/usr/lib/boost-1.81.0/lib/cmake/Boost-1.81.0")  #BoostConfig.cmake
 
+message("$(VIM:build_dir)")
+
 project(solar_system LANGUAGES CXX)
 
 add_subdirectory(asteroid)

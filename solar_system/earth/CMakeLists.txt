@@ -9,4 +9,5 @@ target_link_libraries(main PUBLIC TBB::tbb)
 find_package(Boost 1.81.0 CONFIG REQUIRED COMPONENTS container)
 target_link_libraries(main PUBLIC Boost::container)
 
-target_link_libraries(main PUBLIC mercury;asteroid)
+target_link_libraries(main PUBLIC mercury)
+target_link_libraries(main PUBLIC asteroid)

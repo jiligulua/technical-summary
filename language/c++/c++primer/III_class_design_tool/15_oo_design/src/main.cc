@@ -1,17 +1,16 @@
 #include <iostream>
 using std::cout; using std::endl;
 
+#include <algorithm>
+#include <memory>
+using std::shared_ptr;
 #include <utility>
-
 #include <vector>
 using std::vector;
 
-#include <memory>
-using std::shared_ptr;
-
-#include <algorithm>
 
 #include "quote.h"
+#include "basket.h"
 
 class Base {
  public:
@@ -73,8 +72,8 @@ class Derived : public Base {
 };
 
 int main() {
-  Quote q("C++20", 68);
-  BulkQuote bulk_quote("C++17", 58.0, 5, 0.2);
+  mars::Quote q("C++20", 68);
+  mars::BulkQuote bulk_quote("C++17", 58.0, 5, 0.2);
 
   //DiscQuote d;
 
@@ -93,13 +92,23 @@ int main() {
   derived.display();
   derived.display("Hello World");
   
-  vector<shared_ptr<Quote>> quotes;
-  quotes.push_back(std::make_shared<BulkQuote>("C++ Primer", 58, 10, 0.1));
-  quotes.push_back(std::make_shared<Quote>("Modern Effective C++", 58));
 
+  vector<shared_ptr<mars::Quote>> quotes;
+  quotes.push_back(std::make_shared<mars::BulkQuote>("C++ Primer", 58, 10, 0.1));
+  quotes.push_back(std::make_shared<mars::Quote>("Modern Effective C++", 58));
+  
   cout << "---------------" << endl;
 
   for (auto item : quotes)
 	cout << item->net_price(20) << endl;
   
+  cout << "test basket------------------" << endl;
+  mars::BulkQuote bq("More Effective", 60, 20, 0.1);
+  mars::Quote qt("C++11", 50);
+  mars::Basket basket;
+  basket.AddItem(bq);
+  basket.AddItem(qt);
+  basket.TotalReceipt(cout);
+
+
 }

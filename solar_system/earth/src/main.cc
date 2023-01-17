@@ -1,6 +1,7 @@
 #include <iostream>
 using std::cout; using std::endl;
 
+#include <fstream>
 #include <string>
 using std::string;
 #include <tuple>
@@ -13,6 +14,8 @@ using std::vector;
 #include <asteroid/simple_print.h>
 #include <mercury/merge_sort.h>
 #include <mercury/task_list.h>
+
+#include <earth/test_text_query.h>
 
 int main(int argc, char* argv[]) {
   // test merge-sort
@@ -52,4 +55,34 @@ int main(int argc, char* argv[]) {
 			std::cout << std::endl;
 		}
 	}
+	
+
+	char src[] = "Hello World! I love you!";
+	std::cout << "raw: " << src << std::endl;
+	mercury::ReverseSequence(src);
+
+	std::cout << "chg: " << src << std::endl;
+
+	char src2[] = "abcdefg";
+	int index = 6;
+	std::cout << "raw: " << src2 << " index: " << index << std::endl;
+	mercury::LeftRotateStr(src2, index);
+	std::cout << "chg: " << src2 << std::endl;
+	
+	std::cout << "get max sequence " << std::endl;
+	//int src3[] = {4, 5, 1, 2, 6, 2, 5, 1};
+	//auto ret3 = mercury::GetMaxSequence(src3, 3, 8);
+	//asteroid::print(ret3);
+
+	std::vector<int> ivec4 {4,3,1,2,6,2,5,1};
+	auto ret4 = mercury::GetMaxSequence2(ivec4, 3);
+	asteroid::print(ret4);
+
+	std::cout << "-----------------------------------------" << std::endl;
+	std::cout << "Test text query function:" << std::endl;
+  std::ifstream is("/home/chris/technical-summary/solar_system/1.txt", std::ios::in);
+  earth::RunQueries(is);
+
+  std::vector<std::string> str;
+
 }
