@@ -103,6 +103,8 @@ unsigned GetSum3(unsigned n) {
 //  return Accumulate<n>::N;
 //}
 
+
+
 int main() {
   cout << "Test 65---------------------------------" << endl;
   vector<int> ivec = {9,5,3,4,5,16,43,23,8};

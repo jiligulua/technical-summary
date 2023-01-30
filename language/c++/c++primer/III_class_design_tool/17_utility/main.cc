@@ -1,8 +1,14 @@
 #include <algorithm>
-#include <iostream>
 #include <bitset>
 using std::bitset;
+#include <fstream>
+using std::fstream;
+#include <iomanip>
+#include <iostream>
+using std::cout; using std::endl;
+#include <iomanip>
 #include <regex>
+using std::regex; using std::regex_replace;
 #include <string>
 using std::string;
 #include <tuple>
@@ -143,6 +149,123 @@ void test_1714() {
   }
 }
 
+void TestRegexReplace() {
+  cout << __func__ << endl;
+  string format = "$2.$5.$7";
+  string pattern = "(\\()?(\\d{3})(\\))?([-. ])?(\\d{3})([-. ]?)(\\d{4})";
+  regex r(pattern);
+  string line;
+  cout << "Please input the elephone number: " << endl;
+  while (getline(std::cin, line)) {
+    std::cout << regex_replace(line, r, format, std::regex_constants::format_no_copy);
+  }
+}
+
+void TestIO() {
+  std::cout << __func__ << endl;
+  std::cout << std::boolalpha << true << " " << false << std::endl;  
+  std::cout << std::noboolalpha;
+  std::cout << "Hello World" << std::ends << "I love you" << endl;
+  float f1 = 1233.1415926;
+  std::cout << f1 << endl;
+  std::cout << std::scientific << f1 << std::fixed << endl;
+  float f2 = 0.002312453;
+  //std::cout << std::hexfloat << f2 << std::defaultfloat <<  endl;
+  std::cout << std::setprecision(7) << f2 <<  endl;
+}
+
+void TestManipulator() {
+  cout << __func__ << endl;
+  int i = -16;
+  double d = 3.1415926;
+  cout << "i: " << std::setw(12) << i << "|" << endl; 
+  cout << "d: " << std::setw(12) << d << "|" << endl; 
+  cout << std::left;
+  cout << "i: " << std::setw(12) << i << "|" << endl; 
+  cout << "d: " << std::setw(12) << d << "|" << endl; 
+  cout << std::right;
+
+  cout << "i: " << std::setw(12) << i << "|" << endl; 
+  cout << "d: " << std::setw(12) << d << "|" << endl; 
+
+  cout << std::internal;
+  cout << "i: " << std::setw(12) << i << "|" << endl; 
+  cout << "d: " << std::setw(12) << d << "|" << endl; 
+
+  cout << std::setfill('#');
+  cout << "i: " << std::setw(12) << i << "|" << endl; 
+  cout << "d: " << std::setw(12) << d << "|" << endl; 
+  //cout << "i: " << std::setw(12) << i << "|" << endl; 
+  //cout << "d: " << std::setw(12) << d << "|" << endl; 
+  //char ch;
+  //while (std::cin.get(ch))
+  //  std::cout.put(ch);
+
+  //char sz[1024] = {0};
+  //std::cin.getline(sz, 1024, '#');
+  ////std::cin.get(sz, 1024, '#');
+  //std::cout << sz ;
+
+  //is.getline(sz, SIZE, ':');
+  //cout << sz << endl;
+  //is.read(sz, SIZE);
+  //cout << sz << endl;
+  //cout << is.gcount() << endl;
+  //int ch;
+  //while ((ch = std::cin.get()) != EOF)
+  //  std::cout.put(ch);
+  //cout << "end of test manipulate" << endl;
+  
+}
+
+void TestIO2() {
+  std::string path("/home/chris/technical-summary/language/c++/c++primer/III_class_design_tool/17_utility/17.txt");
+  std::ifstream is(path, std::ios_base::in);
+  constexpr unsigned SIZE = 10;
+  char sz[SIZE] = {0};
+  while (!is.eof()) {
+    is.getline(sz, SIZE);
+    cout << sz << endl;
+    if (!is.good()) {
+      if (is.gcount() == 9) 
+        is.clear();
+      else 
+        break;
+    } else {
+      cout << endl;
+    }
+  }
+
+  std::clog << "Hello, I am a log." << endl;
+}
+
+void AddPosInLastLine() {
+  std::string path("/home/chris/technical-summary/language/c++/c++primer/III_class_design_tool/17_utility/17.txt");
+  std::fstream inout(path, fstream::ate | fstream::in | fstream::out);
+  if (!inout) {
+    std::cerr << "Can't open the file" << std::endl;
+    return;
+  }
+
+  auto end_mark = inout.tellg();
+  inout.seekg(0, fstream::beg);
+  string line;
+  size_t cnt = 0;
+  while (inout 
+         && inout.tellg() != end_mark 
+         && getline(inout, line)) {
+    cnt += line.size() + 1;
+    auto mark = inout.tellg();
+    inout.seekg(0, fstream::end);
+    inout << cnt;
+    if (mark != end_mark) 
+      inout << " ";
+    inout.seekg(mark);
+  }
+  inout.seekp(0, fstream::end);
+  inout << endl;
+}
+
 int main(int argc, char* argv[]) {
   bitset<13> bitvec(5);   // 101
   if (bitvec.any())
@@ -170,6 +293,12 @@ int main(int argc, char* argv[]) {
   test_1710();
   test_1714();
   test_1732();
+
+  //TestRegexReplace();
+  TestIO();
+  TestManipulator();
+  TestIO2();
+  AddPosInLastLine();
 
   return 1;
 }

@@ -16,8 +16,8 @@
 !/design_pattern/**/
 !/library/
 !/library/**/
-!/machine_language/
-!/machine_language/**/
+!/machine_learning/
+!/machine_learning/**/
 !/interview/
 !/interview/**/
 !/solar_system/
@@ -30,6 +30,7 @@
 !*.cxx
 !*.h
 !*.hpp
+!*.py
 
 !*.md
 !*.txt
